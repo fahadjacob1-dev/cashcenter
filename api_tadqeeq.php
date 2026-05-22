@@ -32,7 +32,7 @@ switch ($action) {
         $op_num = trim($_GET['op_num'] ?? '');
         if (!$op_num) json_error('رقم العملية مطلوب');
 
-        $stmt = $conn->prepare('SELECT i.*, c.name as client_name, u.full_name as emp_name FROM istilam i JOIN clients c ON c.id = i.client_id JOIN users u ON u.id = i.emp_id WHERE i.op_num = ?');
+        $stmt = $conn->prepare("SELECT i.*, c.name as client_name, u.full_name as emp_name FROM istilam i JOIN clients c ON c.id = i.client_id JOIN users u ON u.id = i.emp_id WHERE i.op_num = ? AND i.status = 'pending'");
         $stmt->bind_param('s', $op_num);
         $stmt->execute();
         $res = $stmt->get_result();

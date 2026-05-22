@@ -305,6 +305,10 @@ let totalBags = 0;
 let currentBag = 1;
 let currentOpNum = '';
 
+let allAuditDenoms = {};
+let grandAuditTotalValue = 0;
+let grandAuditTotalCount = 0;
+
 const currencies = {
     'دينار': [50000, 25000, 10000, 5000, 1000, 500, 250],
     'دولار': [100, 50, 20, 10, 5, 2, 1],
@@ -349,6 +353,10 @@ function searchOp() {
             
             currentBag = 1;
             document.getElementById('bagFrom').value = currentBag;
+            
+            allAuditDenoms = {};
+            grandAuditTotalValue = 0;
+            grandAuditTotalCount = 0;
             
             buildMainRows();
             openAuditModal();
@@ -404,6 +412,8 @@ function submitAuditBag() {
         formData.append('d'+d, count);
         totalValue += (count * d);
         totalCount += count;
+        
+        allAuditDenoms[d] = (allAuditDenoms[d] || 0) + count;
     });
     
     fetch('api_tadqeeq.php', { method: 'POST', body: formData })
@@ -411,13 +421,16 @@ function submitAuditBag() {
     .then(data => {
         if(data.success) {
             if(data.data.match === 'match') {
+                grandAuditTotalValue += totalValue;
+                grandAuditTotalCount += totalCount;
+                
                 if(currentBag < totalBags) {
                     currentBag++;
                     document.getElementById('bagFrom').value = currentBag;
                     openAuditModal(); // re-init
                 } else {
                     document.getElementById('auditModal').style.display = 'none';
-                    printDepositReceipt(totalCount, totalValue, denoms);
+                    printDepositReceipt(grandAuditTotalCount, grandAuditTotalValue, denoms, allAuditDenoms);
                 }
             } else {
                 alert('⚠️ اختلاف بالقيم! تم تحويل العملية للمدير');
@@ -430,7 +443,7 @@ function submitAuditBag() {
     }).catch(e => alert('خطأ بالاتصال'));
 }
 
-function printDepositReceipt(totalCount, totalValue, denoms) {
+function printDepositReceipt(totalCount, totalValue, denoms, auditDenoms) {
     const date = new Date();
     document.getElementById('pDate').textContent = date.toLocaleDateString('en-US');
     document.getElementById('pTime').textContent = date.toLocaleTimeString('en-US');
@@ -443,7 +456,7 @@ function printDepositReceipt(totalCount, totalValue, denoms) {
     tbody.innerHTML = '';
     
     denoms.forEach(d => {
-        const count = parseInt(document.getElementById('minp_'+d).value) || 0;
+        const count = auditDenoms[d] || 0;
         const val = count * d;
         if(count > 0 || true) { // Displaying all rows or just non-zero? In screenshot all rows show.
             tbody.innerHTML += `
