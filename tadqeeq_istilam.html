@@ -328,14 +328,30 @@ function buildMainRows() {
 }
 buildMainRows();
 
+function searchOp() {
+    const num = document.getElementById('searchNum').value.trim();
+    if(!num) { alert('ادخل رقم العملية'); return; }
+    
+    fetch(`api_tadqeeq.php?action=get_istilam_info&op_num=${encodeURIComponent(num)}`)
+    .then(r=>r.json())
+    .then(data => {
+        if(data.success) {
+            const info = data.data;
+            currentIstilamId = info.id;
+            currentCurrency = info.currency;
+            totalBags = parseInt(info.bags_count);
+            currentOpNum = info.op_num;
+            
+            document.getElementById('dispClient').value = info.client_name;
+            document.getElementById('dispDate').value = info.op_date;
+            document.getElementById('dispCurrency').value = info.currency;
+            document.getElementById('bagTo').value = totalBags;
+            
             currentBag = 1;
             document.getElementById('bagFrom').value = currentBag;
             
             buildMainRows();
-            
-            // افتح النافذة المنبثقة تلقائياً
             openAuditModal();
-            
         } else {
             alert('العملية غير موجودة أو تم تدقيقها مسبقاً');
         }
