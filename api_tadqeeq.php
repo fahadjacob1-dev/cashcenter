@@ -79,7 +79,7 @@ switch ($action) {
                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)'
             );
             $stmt->bind_param(
-                'iiiiiiiiiiids',
+                'iiiiiiiiiidss',
                 $istilam_id, $bag_num, $auditor_id,
                 $d50000, $d25000, $d10000, $d5000, $d1000, $d500, $d250,
                 $total, $match, $notes
@@ -178,7 +178,7 @@ switch ($action) {
              VALUES (?,?,?,?,?,?,?,?,?,?,?,?)'
         );
         $stmt->bind_param(
-            'iiiiiiiiiids',
+            'iiiiiiiiiiss',
             $sahb_id, $auditor_id,
             $d50000, $d25000, $d10000, $d5000, $d1000, $d500, $d250,
             $total, $match, $notes
