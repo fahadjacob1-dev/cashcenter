@@ -263,7 +263,7 @@ body::before{
   </div>
   <div class="header-right">
     <div class="date-badge" id="dateBadge"></div>
-    <button class="user-btn">👤 تسجيل الدخول</button>
+    <button class="user-btn" onclick="logout()">👤 <span id="userDisplayName">تسجيل الخروج</span></button>
   </div>
 </div>
 
@@ -369,5 +369,6 @@ const inner = document.getElementById('tickerInner');
 // Ops count from localStorage
 document.getElementById('opsCount').textContent = localStorage.getItem('opsToday')||'0';
 </script>
+<script src="auth_check.js"></script>
 </body>
 </html>
