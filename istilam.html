@@ -258,7 +258,7 @@ body {
 let totalBags = 0;
 let currentBag = 1;
 let allBagsData = [];
-let opNumGenerated = "IST-" + Math.floor(Math.random() * 9000 + 1000); // Temporary display
+let opNumGenerated = "---";
 
 const currencies = {
     'دينار': [50000, 25000, 10000, 5000, 1000, 500, 250],
@@ -267,7 +267,16 @@ const currencies = {
 };
 
 document.getElementById('depDate').value = new Date().toISOString().slice(0,16);
-document.getElementById('lblOpNum').textContent = opNumGenerated;
+
+// Fetch real next operation number from DB
+fetch('api_istilam.php?action=get_next_op_num')
+    .then(r=>r.json())
+    .then(data => {
+        if(data.success) {
+            opNumGenerated = data.data.next_op_num;
+            document.getElementById('lblOpNum').textContent = opNumGenerated;
+        }
+    }).catch(e => console.log('تعذر جلب رقم العملية'));
 
 function updateCurrency() {
     // Reset if currency changes

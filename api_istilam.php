@@ -10,6 +10,17 @@ $action = $_REQUEST['action'] ?? '';
 
 switch ($action) {
 
+    // ── جلب الرقم القادم للعملية ────────────────────
+    case 'get_next_op_num':
+        // نجلب الرقم التلقائي القادم (AUTO_INCREMENT) لجدول istilam
+        $res = $conn->query("SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'istilam' AND table_schema = DATABASE()");
+        $next_id = 1;
+        if ($res && $row = $res->fetch_assoc()) {
+            $next_id = (int)$row['AUTO_INCREMENT'];
+        }
+        json_success(['next_op_num' => $next_id]);
+        break;
+
     // ── جلب كل عمليات الاستلام ──────────────────────
     case 'get_all':
         $stmt = $conn->prepare(
@@ -75,24 +86,27 @@ switch ($action) {
         $valid_currencies = ['دينار', 'دولار', 'يورو'];
         if (!in_array($currency, $valid_currencies, true)) json_error('عملة غير صالحة');
 
-        $op_num = generate_op_num('IST');
-
         $conn->begin_transaction();
         try {
+            // سندخل op_num مؤقت أولاً، ثم نحدثه ليكون نفس الـ ID المتسلسل
             $stmt = $conn->prepare(
                 'INSERT INTO istilam
                  (op_num, emp_id, client_id, op_date, currency, total_amount, bags_count, liquidity,
                   d50000, d25000, d10000, d5000, d1000, d500, d250)
-                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                 VALUES ("TEMP",?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             );
             $stmt->bind_param(
-                'siissddiiiiiiii',
-                $op_num, $emp_id, $client_id, $op_date, $currency,
+                'iissddiiiiiiii',
+                $emp_id, $client_id, $op_date, $currency,
                 $total, $bags, $liquidity,
                 $d50000, $d25000, $d10000, $d5000, $d1000, $d500, $d250
             );
             $stmt->execute();
             $new_id = (int)$conn->insert_id;
+            
+            // تحديث رقم العملية ليكون نفس المعرف (يبدأ من 1 ويزداد تلقائياً)
+            $op_num = (string)$new_id;
+            $conn->query("UPDATE istilam SET op_num = '$op_num' WHERE id = $new_id");
 
             // Insert bags
             $bag_stmt = $conn->prepare(
