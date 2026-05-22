@@ -221,7 +221,7 @@ body {
         <div>الفئة</div>
     </div>
     <div id="mainDenomsContainer"></div>
-    <button class="btn-audit" onclick="openAuditModal()">تدقيق</button>
+    <button class="btn-audit" onclick="openAuditModal()">تدقيق الاكياس (اضغط هنا)</button>
 </div>
 
 <!-- Modal -->
@@ -311,16 +311,16 @@ const currencies = {
     'يورو': [500, 200, 100, 50, 20, 10, 5]
 };
 
-// Build dummy rows for main screen
+// Build rows for main screen (readonly summary)
 function buildMainRows() {
     const container = document.getElementById('mainDenomsContainer');
     container.innerHTML = '';
-    const denoms = currencies['دينار'];
+    const denoms = currencies[currentCurrency] || currencies['دينار'];
     denoms.forEach(d => {
         container.innerHTML += `
-            <div class="denom-row">
-                <input type="text" value="0" readonly>
-                <input type="text" value="0" readonly>
+            <div class="denom-row" style="margin-bottom:10px;">
+                <input type="text" value="0" readonly style="background:#ddd; color:#000;">
+                <input type="number" value="0" disabled>
                 <label>فئة ${d.toLocaleString('ar-IQ')}</label>
             </div>
         `;
@@ -328,28 +328,16 @@ function buildMainRows() {
 }
 buildMainRows();
 
-function searchOp() {
-    const num = document.getElementById('searchNum').value.trim();
-    if(!num) { alert('ادخل رقم العملية'); return; }
-    
-    fetch(`api_tadqeeq.php?action=get_istilam_info&op_num=${encodeURIComponent(num)}`)
-    .then(r=>r.json())
-    .then(data => {
-        if(data.success) {
-            const info = data.data;
-            currentIstilamId = info.id;
-            currentCurrency = info.currency;
-            totalBags = parseInt(info.bags_count);
-            currentOpNum = info.op_num;
+            currentBag = 1;
+            document.getElementById('bagFrom').value = currentBag;
             
-            document.getElementById('dispClient').value = info.client_name;
-            document.getElementById('dispDate').value = info.op_date;
-            document.getElementById('dispCurrency').value = info.currency;
-            document.getElementById('bagTo').value = totalBags;
+            buildMainRows();
             
-            currentBag = parseInt(document.getElementById('bagFrom').value) || 1;
+            // افتح النافذة المنبثقة تلقائياً
+            openAuditModal();
+            
         } else {
-            alert('العملية غير موجودة');
+            alert('العملية غير موجودة أو تم تدقيقها مسبقاً');
         }
     }).catch(e => alert('خطأ اتصال'));
 }
@@ -384,6 +372,8 @@ function updateModalNextBtn() {
 }
 
 function submitAuditBag() {
+    if(!currentIstilamId) { alert('ابحث عن العملية اولاً'); return; }
+
     const denoms = currencies[currentCurrency] || currencies['دينار'];
     const formData = new FormData();
     formData.append('action', 'save_istilam');
@@ -407,6 +397,7 @@ function submitAuditBag() {
             if(data.data.match === 'match') {
                 if(currentBag < totalBags) {
                     currentBag++;
+                    document.getElementById('bagFrom').value = currentBag;
                     openAuditModal(); // re-init
                 } else {
                     document.getElementById('auditModal').style.display = 'none';
@@ -415,6 +406,7 @@ function submitAuditBag() {
             } else {
                 alert('⚠️ اختلاف بالقيم! تم تحويل العملية للمدير');
                 document.getElementById('auditModal').style.display = 'none';
+                setTimeout(() => { window.location.reload(); }, 2000);
             }
         } else {
             alert('خطأ: ' + data.error);
