@@ -10,12 +10,12 @@ if (basename($_SERVER['PHP_SELF']) === 'config.php') {
 }
 
 // ── إعدادات قاعدة البيانات ──────────────────────────
-// غيّر هذه القيم حسب سيرفرك
-define('DB_HOST', '127.0.0.1');   // localhost أو IP السيرفر
-define('DB_USER', 'cashcenter_user');   // مو root!
-define('DB_PASS', 'CHANGE_THIS_STRONG_PASSWORD');   // ← غيّر هذا
-define('DB_NAME', 'cashcenter');
-define('DB_PORT', 3306);
+// جلب الإعدادات تلقائياً من بيئة Railway (أو استخدام الافتراضي للوكل)
+define('DB_HOST', getenv('DB_HOST') ?: getenv('MYSQLHOST') ?: '127.0.0.1');
+define('DB_USER', getenv('DB_USER') ?: getenv('MYSQLUSER') ?: 'cashcenter_user');
+define('DB_PASS', getenv('DB_PASS') ?: getenv('MYSQLPASSWORD') ?: 'CHANGE_THIS_STRONG_PASSWORD');
+define('DB_NAME', getenv('DB_NAME') ?: getenv('MYSQLDATABASE') ?: 'cashcenter');
+define('DB_PORT', getenv('DB_PORT') ?: getenv('MYSQLPORT') ?: 3306);
 
 // ── إعدادات الجلسة ──────────────────────────────────
 define('SESSION_NAME',    'cc_session');

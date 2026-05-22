@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة الموظفين — Cash Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--maroon:#8B0045;--maroon-dark:#6B0035;--gold:#C9A84C;--gold-light:#E2C97E}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:#f9f9f9;
+  color:#333;
+}
+.header {
+  background: var(--maroon);
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.header h1 { font-size: 24px; color: var(--gold-light); }
+.header button {
+  background: var(--gold); color: var(--maroon-dark); border: none;
+  padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;
+}
+.container {
+  max-width: 1000px; margin: 40px auto; padding: 20px;
+}
+.card {
+  background: white; border-radius: 15px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  margin-bottom: 30px;
+}
+.card-title {
+  color: var(--maroon); font-size: 20px; font-weight: bold; margin-bottom: 20px;
+  border-bottom: 2px solid var(--gold-light); padding-bottom: 10px; display: inline-block;
+}
+table {
+  width: 100%; border-collapse: collapse; margin-top: 20px;
+}
+th, td {
+  padding: 15px; text-align: right; border-bottom: 1px solid #eee;
+}
+th {
+  background: var(--maroon); color: white;
+}
+tr:hover { background: #fdfdfd; }
+.btn {
+  padding: 8px 15px; border: none; border-radius: 5px; font-family: 'Tajawal'; font-weight: bold; cursor: pointer;
+}
+.btn-edit { background: var(--gold); color: var(--maroon-dark); }
+.btn-delete { background: #ef4444; color: white; }
+
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--maroon); }
+.form-group input, .form-group select {
+  width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Tajawal'; font-size: 15px;
+}
+.form-row { display: flex; gap: 15px; }
+.form-row > div { flex: 1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>إدارة الموظفين - Cash Center</h1>
+  <button onclick="location.href='index.html'">العودة للرئيسية</button>
+</div>
+
+<div class="container">
+  
+  <!-- نموذج الإضافة / التعديل -->
+  <div class="card">
+    <div class="card-title" id="formTitle">إضافة موظف جديد</div>
+    <form id="userForm">
+      <input type="hidden" id="userId">
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>اسم المستخدم (للدخول)</label>
+          <input type="text" id="username" required>
+        </div>
+        <div class="form-group">
+          <label>الاسم الكامل</label>
+          <input type="text" id="fullName" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>كلمة المرور</label>
+          <input type="password" id="password" placeholder="اتركه فارغاً إذا لا تريد تغييره (في حالة التعديل)">
+        </div>
+        <div class="form-group">
+          <label>الصلاحية</label>
+          <select id="role">
+            <option value="employee">موظف عادي</option>
+            <option value="supervisor">مشرف</option>
+            <option value="auditor">مدقق</option>
+            <option value="admin">مدير نظام</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-group" id="statusGroup" style="display:none;">
+          <label>حالة الحساب</label>
+          <select id="isActive">
+            <option value="1">فعّال</option>
+            <option value="0">موقوف</option>
+          </select>
+      </div>
+
+      <button type="submit" class="btn btn-edit" style="width: 100%; padding: 15px; font-size: 16px; margin-top: 10px;">حفظ الموظف</button>
+    </form>
+  </div>
+
+  <!-- جدول الموظفين -->
+  <div class="card">
+    <div class="card-title">قائمة الموظفين</div>
+    <table>
+      <thead>
+        <tr>
+          <th>اسم المستخدم</th>
+          <th>الاسم الكامل</th>
+          <th>الصلاحية</th>
+          <th>الحالة</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody id="usersTable">
+        <!-- سيتم ملء البيانات من السيرفر -->
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+// جلب المستخدمين عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', loadUsers);
+
+async function loadUsers() {
+  const res = await fetch('api_users.php?action=list');
+  const data = await res.json();
+  
+  if(data.success) {
+    const tbody = document.getElementById('usersTable');
+    tbody.innerHTML = '';
+    data.data.forEach(user => {
+      let roleName = user.role == 'admin' ? 'مدير' : user.role == 'supervisor' ? 'مشرف' : user.role == 'auditor' ? 'مدقق' : 'موظف';
+      let status = user.is_active == 1 ? '<span style="color:green">فعال</span>' : '<span style="color:red">موقوف</span>';
+      
+      tbody.innerHTML += `
+        <tr>
+          <td>${user.username}</td>
+          <td>${user.full_name}</td>
+          <td>${roleName}</td>
+          <td>${status}</td>
+          <td>
+            <button class="btn btn-edit" onclick='editUser(${JSON.stringify(user)})'>تعديل</button>
+            <button class="btn btn-delete" onclick='deleteUser(${user.id})'>حذف</button>
+          </td>
+        </tr>
+      `;
+    });
+  } else {
+    alert(data.error);
+    if(data.error.includes('غير مصرح') || data.error.includes('صلاحية')) location.href = 'login.html';
+  }
+}
+
+// حفظ أو إضافة موظف
+document.getElementById('userForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const id = document.getElementById('userId').value;
+  const fd = new FormData();
+  fd.append('action', id ? 'update' : 'add');
+  
+  if (id) fd.append('id', id);
+  fd.append('username', document.getElementById('username').value);
+  fd.append('full_name', document.getElementById('fullName').value);
+  fd.append('password', document.getElementById('password').value);
+  fd.append('role', document.getElementById('role').value);
+  if (id) fd.append('is_active', document.getElementById('isActive').value);
+
+  const res = await fetch('api_users.php', { method: 'POST', body: fd });
+  const data = await res.json();
+  
+  if(data.success) {
+    alert(data.message);
+    document.getElementById('userForm').reset();
+    document.getElementById('userId').value = '';
+    document.getElementById('username').disabled = false;
+    document.getElementById('formTitle').innerText = 'إضافة موظف جديد';
+    document.getElementById('statusGroup').style.display = 'none';
+    loadUsers();
+  } else {
+    alert(data.error);
+  }
+});
+
+// تعبئة نموذج التعديل
+function editUser(user) {
+  document.getElementById('formTitle').innerText = 'تعديل بيانات الموظف: ' + user.full_name;
+  document.getElementById('userId').value = user.id;
+  document.getElementById('username').value = user.username;
+  document.getElementById('username').disabled = true; // لا يمكن تغيير اليوزر
+  document.getElementById('fullName').value = user.full_name;
+  document.getElementById('role').value = user.role;
+  document.getElementById('isActive').value = user.is_active;
+  document.getElementById('statusGroup').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+// حذف موظف
+async function deleteUser(id) {
+  if(!confirm('هل أنت متأكد من حذف هذا الموظف؟')) return;
+  
+  const fd = new FormData();
+  fd.append('action', 'delete');
+  fd.append('id', id);
+  
+  const res = await fetch('api_users.php', { method: 'POST', body: fd });
+  const data = await res.json();
+  
+  if(data.success) {
+    loadUsers();
+  } else {
+    alert(data.error);
+  }
+}
+</script>
+</body>
+</html>
