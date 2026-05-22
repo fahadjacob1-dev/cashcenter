@@ -238,15 +238,15 @@ body {
             <label>المبلغ الكلي</label>
         </div>
         <div class="form-row">
-            <input type="text" id="commission" value="0">
+            <input type="text" id="commission" value="">
             <label>العمولة</label>
         </div>
         <div class="form-row">
-            <input type="number" id="bagsCount" value="2" min="1">
+            <input type="number" id="bagsCount" value="" min="1">
             <label>عدد الاكياس</label>
         </div>
         
-        <button class="btn-prepare" id="btnPrepare" onclick="startBags()">تهيئة</button>
+        <button class="btn-prepare" id="btnPrepare" onclick="startBags()">تسجيل</button>
     </div>
 </div>
 
@@ -392,7 +392,7 @@ function saveOperation() {
     .then(r=>r.json())
     .then(data => {
         if(data.success) {
-            generateThermalLabels(data.op_num);
+            generateThermalLabels(data.data.op_num);
             window.print();
             setTimeout(() => { window.location.reload(); }, 2000);
         } else {
