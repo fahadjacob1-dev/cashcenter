@@ -6,18 +6,21 @@ header('Content-Type: application/json; charset=utf-8');
 require_once 'config.php';
 
 // تحديث بنية جدول الاختلافات تلقائياً لتجنب مشاكل الحفظ
-try {
-    $conn->query("ALTER TABLE ikhtilaf ADD COLUMN bag_num SMALLINT UNSIGNED NOT NULL AFTER op_id");
-    $conn->query("ALTER TABLE ikhtilaf ADD COLUMN diff_amount DECIMAL(18,3) NOT NULL AFTER bag_num");
-    $conn->query("ALTER TABLE ikhtilaf ADD COLUMN status ENUM('pending','resolved') NOT NULL DEFAULT 'pending'");
-    $conn->query("ALTER TABLE ikhtilaf ADD COLUMN notes TEXT");
-    $conn->query("ALTER TABLE ikhtilaf MODIFY manager_id INT UNSIGNED NULL");
-    $conn->query("ALTER TABLE ikhtilaf MODIFY decision ENUM('accept_original','accept_auditor','new_value') NULL");
-    $conn->query("ALTER TABLE ikhtilaf MODIFY final_total DECIMAL(18,3) NULL");
-    $conn->query("ALTER TABLE ikhtilaf MODIFY original_total DECIMAL(18,3) NULL");
-    $conn->query("ALTER TABLE ikhtilaf MODIFY auditor_total DECIMAL(18,3) NULL");
-    $conn->query("ALTER TABLE ikhtilaf MODIFY difference DECIMAL(18,3) NULL");
-} catch(Throwable $e) { }
+$alter_queries = [
+    "ALTER TABLE ikhtilaf ADD COLUMN bag_num SMALLINT UNSIGNED NOT NULL AFTER op_id",
+    "ALTER TABLE ikhtilaf ADD COLUMN diff_amount DECIMAL(18,3) NOT NULL AFTER bag_num",
+    "ALTER TABLE ikhtilaf ADD COLUMN status ENUM('pending','resolved') NOT NULL DEFAULT 'pending'",
+    "ALTER TABLE ikhtilaf ADD COLUMN notes TEXT",
+    "ALTER TABLE ikhtilaf MODIFY manager_id INT UNSIGNED NULL",
+    "ALTER TABLE ikhtilaf MODIFY decision ENUM('accept_original','accept_auditor','new_value') NULL",
+    "ALTER TABLE ikhtilaf MODIFY final_total DECIMAL(18,3) NULL",
+    "ALTER TABLE ikhtilaf MODIFY original_total DECIMAL(18,3) NULL",
+    "ALTER TABLE ikhtilaf MODIFY auditor_total DECIMAL(18,3) NULL",
+    "ALTER TABLE ikhtilaf MODIFY difference DECIMAL(18,3) NULL"
+];
+foreach($alter_queries as $q) {
+    try { $conn->query($q); } catch(Throwable $e) {}
+}
 
 $user   = require_auth();
 $action = $_REQUEST['action'] ?? '';
