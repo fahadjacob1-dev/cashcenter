@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الرئيسية — Cash Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--maroon:#8B0045;--maroon-dark:#6B0035;--gold:#C9A84C;--gold-light:#E2C97E;--bg:#f5f6fa;--card-bg:#ffffff;}
+body{
+  font-family:'Tajawal',sans-serif;
+  background-color:var(--bg);
+  color:#333;
+  min-height:100vh;
+}
+/* Navbar */
+.navbar{
+  background:var(--maroon);
+  padding:15px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);
+  color:#fff;
+}
+.navbar .brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.navbar .brand .icon{
+  background:var(--gold);
+  width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:10px;
+  font-size:20px;
+}
+.navbar .brand h1{font-size:20px;font-weight:800;color:#fff;}
+.navbar .user-info{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+.navbar .user-info span{font-weight:600; font-size: 15px; color: var(--gold-light);}
+.logout-btn{
+  background:rgba(255,255,255,0.15);
+  border:none;
+  color:#fff;
+  padding:8px 16px;
+  border-radius:8px;
+  font-family:'Tajawal',sans-serif;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.3s;
+}
+.logout-btn:hover{background:var(--gold); color:var(--maroon-dark);}
+
+/* Dashboard Grid */
+.container{
+  max-width:1100px;
+  margin:50px auto;
+  padding:0 20px;
+}
+.welcome-sec{margin-bottom:30px;}
+.welcome-sec h2{color:var(--maroon-dark); font-size:26px;}
+.welcome-sec p{color:#666; margin-top:5px; font-size:16px;}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+  gap:25px;
+}
+.card{
+  background:var(--card-bg);
+  border-radius:15px;
+  padding:30px 20px;
+  text-align:center;
+  text-decoration:none;
+  color:var(--maroon-dark);
+  box-shadow:0 8px 25px rgba(0,0,0,0.05);
+  transition:all 0.3s ease;
+  border-bottom:4px solid transparent;
+}
+.card:hover{
+  transform:translateY(-8px);
+  box-shadow:0 12px 30px rgba(139,0,69,0.15);
+  border-color:var(--gold);
+}
+.card .icon{
+  width:60px;height:60px;
+  background:rgba(139,0,69,0.05);
+  color:var(--maroon);
+  font-size:30px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+  margin:0 auto 15px;
+  transition:all 0.3s;
+}
+.card:hover .icon{
+  background:var(--gold);
+  color:#fff;
+  transform:scale(1.1);
+}
+.card h3{font-size:18px; font-weight:800; margin-bottom:8px;}
+.card p{font-size:14px; color:#777; font-weight:500;}
+
+/* Hide elements based on role */
+.admin-only { display: none; }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <div class="brand">
+    <div class="icon">💰</div>
+    <h1>Cash Center</h1>
+  </div>
+  <div class="user-info">
+    <span id="userNameDisplay">جاري التحميل...</span>
+    <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="welcome-sec">
+    <h2>مرحباً بك في النظام</h2>
+    <p>اختر من القائمة أدناه للبدء بالعمليات</p>
+  </div>
+
+  <div class="grid">
+    <!-- استلام -->
+    <a href="#" onclick="alert('واجهة الاستلام قيد البرمجة..')" class="card">
+      <div class="icon">📥</div>
+      <h3>الاستلام</h3>
+      <p>تسجيل عمليات استلام المبالغ</p>
+    </a>
+
+    <!-- سحب -->
+    <a href="#" onclick="alert('واجهة السحب قيد البرمجة..')" class="card">
+      <div class="icon">📤</div>
+      <h3>السحب</h3>
+      <p>تسجيل عمليات سحب المبالغ</p>
+    </a>
+
+    <!-- التقارير -->
+    <a href="#" onclick="alert('واجهة التقارير قيد البرمجة..')" class="card">
+      <div class="icon">📊</div>
+      <h3>التقارير</h3>
+      <p>كشوفات وإحصائيات مفصلة</p>
+    </a>
+
+    <!-- إدارة الموظفين (للمدير فقط) -->
+    <a href="admin_users.html" class="card admin-only" id="adminUsersCard">
+      <div class="icon">👥</div>
+      <h3>إدارة الموظفين</h3>
+      <p>إضافة، حذف وتعديل الصلاحيات</p>
+    </a>
+  </div>
+</div>
+
+<script src="auth_check.js"></script>
+<script>
+// جلب بيانات المستخدم من الجلسة
+async function loadUserData() {
+  try {
+    const res = await fetch('api_auth.php?action=check');
+    const data = await res.json();
+    if(data.success && data.data.logged_in) {
+      const user = data.data.user;
+      document.getElementById('userNameDisplay').textContent = user.full_name + ' (' + getRoleName(user.role) + ')';
+      
+      // إظهار كارت الإدارة إذا كان المستخدم مدير
+      if(user.role === 'admin') {
+        document.getElementById('adminUsersCard').style.display = 'block';
+      }
+    } else {
+      location.href = 'login.html';
+    }
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+function getRoleName(role) {
+  switch(role) {
+    case 'admin': return 'مدير النظام';
+    case 'supervisor': return 'مشرف';
+    case 'auditor': return 'مدقق';
+    default: return 'موظف عادي';
+  }
+}
+
+async function logout() {
+  if(!confirm('هل أنت متأكد من تسجيل الخروج؟')) return;
+  const fd = new FormData();
+  fd.append('action', 'logout');
+  await fetch('api_auth.php', { method: 'POST', body: fd });
+  sessionStorage.removeItem('user');
+  location.href = 'login.html';
+}
+
+// تنفيذ عند تحميل الصفحة
+window.onload = loadUserData;
+</script>
+</body>
+</html>
