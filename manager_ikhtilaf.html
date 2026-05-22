@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شاشة المدير - معالجة الاختلافات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+    background-color: #8b0045; 
+    font-family: 'Tajawal', sans-serif; 
+    color: white;
+    height: 100vh;
+    overflow-x: hidden; 
+}
+.topbar { background: #6b0035; padding: 10px 20px; display: flex; justify-content: space-between; border-bottom: 2px solid #c9a84c; }
+.back-btn { color: white; text-decoration: none; font-weight: bold; background: #c9a84c; color: #6b0035; padding: 5px 15px; border-radius: 5px;}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 30px 50px;
+    align-items: flex-start;
+}
+
+.right-header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 400px;
+}
+.form-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px;
+}
+.form-row label {
+    font-weight: bold;
+    font-size: 15px;
+    width: 120px;
+    text-align: right;
+}
+.form-row input, .form-row select {
+    width: 200px;
+    padding: 6px;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.left-header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+.left-header .form-row { justify-content: center; }
+
+.btn-submit {
+    background: #fff;
+    color: #000;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 8px 40px;
+    border: none;
+    cursor: pointer;
+    margin-top: 30px;
+}
+
+.main-columns {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 50px;
+    margin-top: 10px;
+}
+
+.col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.col-title {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.denom-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.denom-row input {
+    width: 120px;
+    padding: 6px;
+    text-align: center;
+    font-weight: bold;
+    border: none;
+}
+.denom-row label {
+    font-weight: bold;
+    font-size: 16px;
+    width: 60px;
+}
+.readonly-input { background: #ddd; color: #333; }
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <a href="index.html" class="back-btn">رجوع للرئيسية</a>
+    <div>شاشة المدير - معالجة الاختلافات</div>
+</div>
+
+<div class="header-container">
+    <div class="left-header">
+        <div class="form-row">
+            <input type="text" id="dispCurrency" readonly>
+            <label>نوع العملة</label>
+        </div>
+        <div class="form-row">
+            <input type="text" id="grandTotal" readonly value="0">
+            <label>المبلغ الكلي</label>
+        </div>
+        <button class="btn-submit" onclick="submitResolution()">تثبيت</button>
+    </div>
+
+    <div class="right-header">
+        <div class="form-row">
+            <input type="text" id="empName">
+            <label>اسم الموظف</label>
+        </div>
+        <div class="form-row">
+            <input type="password" id="empPass">
+            <label>كلمة المرور</label>
+        </div>
+        <div class="form-row">
+            <select id="disputeSelect" onchange="loadDispute()">
+                <option value="">-- لا يوجد اختلافات --</option>
+            </select>
+            <label>اختر رقم العملية</label>
+        </div>
+        <div class="form-row">
+            <input type="text" id="dispClient" readonly>
+            <label>اسم العميل</label>
+        </div>
+        <div class="form-row">
+            <input type="text" id="dispDate" readonly>
+            <label>التاريخ</label>
+        </div>
+        <div class="form-row">
+            <input type="text" id="dispOpType" value="استلام نقدي" readonly>
+            <label>نوع العملية</label>
+        </div>
+    </div>
+</div>
+
+<div class="main-columns">
+    <!-- Left Column: Manager -->
+    <div class="col" id="colManager">
+        <div class="col-title">المدير</div>
+        <!-- Generated -->
+    </div>
+    
+    <!-- Middle Column: Auditor -->
+    <div class="col" id="colAuditor">
+        <div class="col-title">المدقق</div>
+        <!-- Generated -->
+    </div>
+    
+    <!-- Right Column: Initial Receipt -->
+    <div class="col" id="colInitial">
+        <div class="col-title">الاستلام الاولي</div>
+        <!-- Generated -->
+    </div>
+</div>
+
+<script>
+const currencies = {
+    'دينار': [50000, 25000, 10000, 5000, 1000, 500, 250],
+    'دولار': [100, 50, 20, 10, 5, 2, 1],
+    'يورو': [500, 200, 100, 50, 20, 10, 5]
+};
+
+let currentDisputes = [];
+let activeCurrency = 'دينار';
+
+function buildColumns(currencyStr) {
+    const denoms = currencies[currencyStr] || currencies['دينار'];
+    activeCurrency = currencyStr;
+    
+    const colInitial = document.getElementById('colInitial');
+    const colAuditor = document.getElementById('colAuditor');
+    const colManager = document.getElementById('colManager');
+    
+    colInitial.innerHTML = '<div class="col-title">الاستلام الاولي</div>';
+    colAuditor.innerHTML = '<div class="col-title">المدقق</div>';
+    colManager.innerHTML = '<div class="col-title">المدير</div>';
+    
+    denoms.forEach(d => {
+        // Initial
+        colInitial.innerHTML += `
+            <div class="denom-row">
+                <input type="text" id="init_${d}" class="readonly-input" readonly value="0">
+                <label>فئة ${d}</label>
+            </div>
+        `;
+        // Auditor
+        colAuditor.innerHTML += `
+            <div class="denom-row">
+                <input type="text" id="aud_${d}" class="readonly-input" readonly value="0">
+                <label>فئة ${d}</label>
+            </div>
+        `;
+        // Manager
+        colManager.innerHTML += `
+            <div class="denom-row">
+                <input type="number" id="man_${d}" data-denom="${d}" min="0" value="0" oninput="calcManagerTotal()">
+                <label>فئة ${d}</label>
+            </div>
+        `;
+    });
+}
+
+function fetchDisputes() {
+    fetch('api_manager.php?action=get_pending_disputes')
+    .then(r=>r.json())
+    .then(data => {
+        if(data.success) {
+            currentDisputes = data.data;
+            const sel = document.getElementById('disputeSelect');
+            if(currentDisputes.length === 0) {
+                sel.innerHTML = '<option value="">-- لا يوجد اختلافات --</option>';
+            } else {
+                sel.innerHTML = '<option value="">-- اختر --</option>';
+                currentDisputes.forEach(d => {
+                    sel.innerHTML += `<option value="${d.ikhtilaf_id}">عملية ${d.op_num} (كيس ${d.bag_num})</option>`;
+                });
+            }
+        }
+    });
+}
+
+function loadDispute() {
+    const ikh_id = document.getElementById('disputeSelect').value;
+    if(!ikh_id) return;
+    
+    const dispute = currentDisputes.find(d => d.ikhtilaf_id == ikh_id);
+    document.getElementById('dispClient').value = dispute.client_name;
+    document.getElementById('dispDate').value = dispute.op_date;
+    document.getElementById('dispCurrency').value = dispute.currency;
+    
+    buildColumns(dispute.currency);
+    document.getElementById('grandTotal').value = '0';
+    
+    // Fetch details
+    fetch(`api_manager.php?action=get_dispute_details&ikhtilaf_id=${ikh_id}`)
+    .then(r=>r.json())
+    .then(data => {
+        if(data.success) {
+            const init = data.data.initial;
+            const aud = data.data.auditor;
+            const denoms = currencies[dispute.currency];
+            
+            denoms.forEach(d => {
+                if(init) document.getElementById('init_'+d).value = init['d'+d] || 0;
+                if(aud) document.getElementById('aud_'+d).value = aud['d'+d] || 0;
+            });
+        }
+    });
+}
+
+function calcManagerTotal() {
+    let total = 0;
+    const inputs = document.querySelectorAll('#colManager input');
+    inputs.forEach(inp => {
+        const denom = parseInt(inp.dataset.denom);
+        const count = parseInt(inp.value) || 0;
+        total += (denom * count);
+    });
+    document.getElementById('grandTotal').value = total.toLocaleString('ar-IQ');
+}
+
+function submitResolution() {
+    const ikh_id = document.getElementById('disputeSelect').value;
+    if(!ikh_id) { alert('اختر العملية أولاً'); return; }
+    
+    const denoms = currencies[activeCurrency];
+    const formData = new FormData();
+    formData.append('action', 'resolve_dispute');
+    formData.append('ikhtilaf_id', ikh_id);
+    
+    denoms.forEach(d => {
+        formData.append('d'+d, document.getElementById('man_'+d).value || 0);
+    });
+    
+    fetch('api_manager.php', { method: 'POST', body: formData })
+    .then(r=>r.json())
+    .then(data => {
+        if(data.success) {
+            alert('تم تثبيت الكيس بنجاح وتحديث الخزنة!');
+            // Reset
+            document.getElementById('dispClient').value = '';
+            document.getElementById('dispDate').value = '';
+            document.getElementById('dispCurrency').value = '';
+            document.getElementById('grandTotal').value = '0';
+            buildColumns('دينار');
+            fetchDisputes(); // reload
+        } else {
+            alert('خطأ: ' + data.error);
+        }
+    }).catch(e => alert('خطأ اتصال'));
+}
+
+// init
+buildColumns('دينار');
+fetchDisputes();
+
+</script>
+</body>
+</html>
