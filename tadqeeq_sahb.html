@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تدقيق السحب</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--maroon:#8B0045;--maroon-dark:#6B0035;--gold:#C9A84C;--gold-light:#E2C97E;--white:#fff}
+body{font-family:'Tajawal',sans-serif;background:var(--maroon);min-height:100vh;color:var(--white)}
+.topbar{background:var(--maroon-dark);border-bottom:2px solid var(--gold);padding:14px 30px;display:flex;align-items:center;justify-content:space-between}
+.topbar h2{font-size:20px;font-weight:800;color:var(--gold)}
+.back-btn{background:rgba(201,168,76,0.15);border:1px solid var(--gold);color:var(--gold);padding:8px 20px;border-radius:20px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.2s}
+.back-btn:hover{background:var(--gold);color:var(--maroon-dark)}
+.page{padding:24px 30px 80px;max-width:900px;margin:0 auto}
+.card{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 24px;margin-bottom:20px}
+.card h3{color:var(--gold);font-size:15px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,0.2)}
+.fields-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.field-group{display:flex;flex-direction:column;gap:6px}
+.field-group label{color:var(--gold-light);font-size:13px;font-weight:600}
+.field-group input,.field-group select{background:rgba(255,255,255,0.95);border:2px solid rgba(255,255,255,0.3);border-radius:8px;padding:9px 12px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:500;color:#333;direction:rtl;transition:border-color 0.2s}
+.field-group input:focus,.field-group select:focus{outline:none;border-color:var(--gold)}
+.search-btn{background:var(--gold);color:var(--maroon-dark);border:none;padding:10px 24px;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;height:38px;align-self:flex-end}
+.search-btn:hover{background:var(--gold-light)}
+.table-header{display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px}
+.table-header span{background:rgba(0,0,0,0.25);border:1px solid rgba(201,168,76,0.3);color:var(--gold-light);font-size:13px;font-weight:700;padding:10px;border-radius:8px;text-align:center}
+.currency-row{display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;align-items:center}
+.denom-label{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);color:var(--gold-light);font-size:14px;font-weight:700;padding:10px;border-radius:8px;text-align:center}
+.currency-row input{background:rgba(255,255,255,0.95);border:2px solid rgba(255,255,255,0.2);border-radius:8px;padding:10px 12px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;color:#333;text-align:center;direction:ltr;transition:all 0.2s}
+.currency-row input:focus{outline:none;border-color:var(--gold)}
+.ro{background:rgba(255,255,255,0.7)!important;cursor:default!important;color:#555!important}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--maroon-dark);border-top:2px solid var(--gold);padding:14px 30px;display:flex;align-items:center;justify-content:space-between}
+.total-label{color:var(--gold-light);font-size:14px;font-weight:600}
+.total-amount{color:var(--gold);font-size:24px;font-weight:800;margin:0 8px}
+.submit-btn{background:var(--gold);color:var(--maroon-dark);border:none;padding:12px 40px;border-radius:25px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(201,168,76,0.4)}
+.submit-btn:hover{background:var(--gold-light);transform:translateY(-2px)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h2>🔍 تدقيق السحب</h2>
+  <a href="index.html" class="back-btn">→ الرئيسية</a>
+</div>
+<div class="page">
+  <div class="card">
+    <h3>بيانات التدقيق</h3>
+    <div class="fields-grid">
+      <div class="field-group">
+        <label>اسم الموظف</label>
+        <select><option value="">-- اختر --</option><option>أحمد محمد</option><option>علي حسن</option></select>
+      </div>
+      <div class="field-group">
+        <label>كلمة المرور</label>
+        <input type="password" placeholder="••••••">
+      </div>
+      <div class="field-group">
+        <label>رقم السحب</label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="searchNum" placeholder="أدخل رقم السحب" style="flex:1">
+          <button class="search-btn" onclick="doSearch()">🔍</button>
+        </div>
+      </div>
+      <div class="field-group">
+        <label>اسم العميل</label>
+        <input type="text" id="dClient" readonly>
+      </div>
+      <div class="field-group">
+        <label>تاريخ السحب</label>
+        <input type="text" id="dDate" readonly>
+      </div>
+      <div class="field-group">
+        <label>نوع العملة</label>
+        <input type="text" id="dCurr" readonly>
+      </div>
+      <div class="field-group" style="grid-column:span 3">
+        <label>المبلغ الكلي</label>
+        <input type="text" id="dTotal" readonly style="font-size:18px;font-weight:800;text-align:center;background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.5);color:#8B0045">
+      </div>
+    </div>
+  </div>
+
+  <div class="table-header">
+    <span>الفئة</span>
+    <span>أدخل عدد الأوراق</span>
+    <span>القيمة</span>
+  </div>
+  <div id="currRows"></div>
+</div>
+<div class="bottom-bar">
+  <div>
+    <span class="total-label">المجموع:</span>
+    <span class="total-amount" id="grandTotal">0</span>
+    <span class="total-label">دينار</span>
+  </div>
+  <button class="submit-btn" onclick="alert('✅ تم حفظ التدقيق بنجاح!')">تدقيق ✓</button>
+</div>
+<script>
+const DENOMS=[50000,25000,10000,5000,1000,500,250];
+const cr=document.getElementById('currRows');
+DENOMS.forEach(d=>{
+  const r=document.createElement('div');r.className='currency-row';
+  r.innerHTML=`<div class="denom-label">${d.toLocaleString('ar-IQ')}</div>
+    <input type="number" class="ci" data-denom="${d}" value="0" min="0" oninput="calc(this)">
+    <input type="text" class="ro" id="v${d}" value="0" readonly>`;
+  cr.appendChild(r);
+});
+function calc(i){
+  const v=parseInt(i.dataset.denom)*(parseInt(i.value)||0);
+  document.getElementById('v'+i.dataset.denom).value=v.toLocaleString('ar-IQ');
+  let t=0;document.querySelectorAll('.ci').forEach(x=>t+=parseInt(x.dataset.denom)*(parseInt(x.value)||0));
+  document.getElementById('grandTotal').textContent=t.toLocaleString('ar-IQ');
+}
+function doSearch(){
+  const n=document.getElementById('searchNum').value;
+  if(!n){alert('يرجى إدخال رقم السحب');return;}
+  document.getElementById('dClient').value='البنك الأهلي';
+  document.getElementById('dDate').value=new Date().toLocaleDateString('ar-IQ');
+  document.getElementById('dCurr').value='دينار';
+  document.getElementById('dTotal').value='1,500,000';
+}
+</script>
+</body>
+</html>

@@ -3,205 +3,366 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>الرئيسية — Cash Center</title>
+<title>Cash Center</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--maroon:#8B0045;--maroon-dark:#6B0035;--gold:#C9A84C;--gold-light:#E2C97E;--bg:#f5f6fa;--card-bg:#ffffff;}
+:root{
+  --maroon:#8B0045;
+  --maroon-dark:#6B0035;
+  --maroon-light:#A0005A;
+  --gold:#C9A84C;
+  --gold-light:#E2C97E;
+  --white:#FFFFFF;
+  --text-light:rgba(255,255,255,0.85);
+  --card-bg:rgba(255,255,255,0.08);
+  --card-border:rgba(255,255,255,0.15);
+}
 body{
   font-family:'Tajawal',sans-serif;
-  background-color:var(--bg);
-  color:#333;
-  min-height:100vh;
-}
-/* Navbar */
-.navbar{
   background:var(--maroon);
-  padding:15px 40px;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* Background pattern */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(139,0,69,0.5) 0%, transparent 50%);
+  pointer-events:none;
+  z-index:0;
+}
+
+.container{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 20px}
+
+/* Header */
+.header{
+  background:linear-gradient(135deg, var(--maroon-dark), var(--maroon));
+  border-bottom:2px solid var(--gold);
+  padding:16px 40px;
   display:flex;
+  align-items:center;
   justify-content:space-between;
-  align-items:center;
-  box-shadow:0 4px 15px rgba(0,0,0,0.1);
-  color:#fff;
+  position:sticky;
+  top:0;
+  z-index:100;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
 }
-.navbar .brand{
+.logo{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:14px;
 }
-.navbar .brand .icon{
+.logo-icon{
+  width:48px;height:48px;
   background:var(--gold);
-  width:40px;height:40px;
+  border-radius:12px;
   display:flex;align-items:center;justify-content:center;
-  border-radius:10px;
-  font-size:20px;
+  font-size:24px;
 }
-.navbar .brand h1{font-size:20px;font-weight:800;color:#fff;}
-.navbar .user-info{
-  display:flex;
-  align-items:center;
-  gap:15px;
+.logo-text h1{
+  color:var(--white);
+  font-size:22px;font-weight:800;
+  line-height:1;
 }
-.navbar .user-info span{font-weight:600; font-size: 15px; color: var(--gold-light);}
-.logout-btn{
-  background:rgba(255,255,255,0.15);
-  border:none;
-  color:#fff;
+.logo-text p{
+  color:var(--gold-light);
+  font-size:12px;font-weight:500;
+  letter-spacing:1px;
+}
+.header-right{
+  display:flex;align-items:center;gap:16px;
+}
+.date-badge{
+  background:rgba(201,168,76,0.15);
+  border:1px solid rgba(201,168,76,0.3);
+  color:var(--gold-light);
   padding:8px 16px;
-  border-radius:8px;
-  font-family:'Tajawal',sans-serif;
-  font-weight:700;
-  cursor:pointer;
-  transition:all 0.3s;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:500;
 }
-.logout-btn:hover{background:var(--gold); color:var(--maroon-dark);}
-
-/* Dashboard Grid */
-.container{
-  max-width:1100px;
-  margin:50px auto;
-  padding:0 20px;
-}
-.welcome-sec{margin-bottom:30px;}
-.welcome-sec h2{color:var(--maroon-dark); font-size:26px;}
-.welcome-sec p{color:#666; margin-top:5px; font-size:16px;}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
-  gap:25px;
-}
-.card{
-  background:var(--card-bg);
-  border-radius:15px;
-  padding:30px 20px;
-  text-align:center;
-  text-decoration:none;
-  color:var(--maroon-dark);
-  box-shadow:0 8px 25px rgba(0,0,0,0.05);
-  transition:all 0.3s ease;
-  border-bottom:4px solid transparent;
-}
-.card:hover{
-  transform:translateY(-8px);
-  box-shadow:0 12px 30px rgba(139,0,69,0.15);
-  border-color:var(--gold);
-}
-.card .icon{
-  width:60px;height:60px;
-  background:rgba(139,0,69,0.05);
-  color:var(--maroon);
-  font-size:30px;
-  display:flex;align-items:center;justify-content:center;
-  border-radius:50%;
-  margin:0 auto 15px;
-  transition:all 0.3s;
-}
-.card:hover .icon{
+.user-btn{
   background:var(--gold);
-  color:#fff;
+  color:var(--maroon-dark);
+  border:none;
+  padding:9px 20px;
+  border-radius:20px;
+  font-family:'Tajawal',sans-serif;
+  font-size:13px;font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.user-btn:hover{background:var(--gold-light);transform:translateY(-1px)}
+
+/* Hero */
+.hero{
+  text-align:center;
+  padding:48px 20px 32px;
+}
+.hero-title{
+  font-size:36px;font-weight:800;
+  color:var(--gold);
+  letter-spacing:2px;
+  text-shadow:0 2px 20px rgba(201,168,76,0.3);
+  margin-bottom:8px;
+}
+.hero-sub{
+  color:var(--text-light);
+  font-size:15px;
+}
+
+/* Ticker bar */
+.ticker{
+  background:rgba(0,0,0,0.25);
+  border-top:1px solid rgba(201,168,76,0.2);
+  border-bottom:1px solid rgba(201,168,76,0.2);
+  padding:10px 0;
+  overflow:hidden;
+  margin-bottom:40px;
+}
+.ticker-inner{
+  display:flex;
+  gap:60px;
+  animation:ticker 30s linear infinite;
+  white-space:nowrap;
+}
+.ticker-item{
+  color:var(--gold-light);
+  font-size:13px;
+  font-weight:500;
+  display:flex;align-items:center;gap:8px;
+}
+.ticker-dot{width:6px;height:6px;background:var(--gold);border-radius:50%}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* Menu Grid */
+.menu-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  padding:0 20px 60px;
+  max-width:1000px;
+  margin:0 auto;
+}
+
+.menu-card{
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:20px;
+  padding:32px 20px;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  text-decoration:none;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  position:relative;
+  overflow:hidden;
+}
+.menu-card::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg, rgba(201,168,76,0.12), transparent);
+  opacity:0;
+  transition:opacity 0.3s;
+}
+.menu-card:hover{
+  transform:translateY(-6px) scale(1.02);
+  border-color:var(--gold);
+  background:rgba(201,168,76,0.12);
+  box-shadow:0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(201,168,76,0.3);
+}
+.menu-card:hover::before{opacity:1}
+
+.card-icon{
+  width:72px;height:72px;
+  border-radius:18px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.1);
+  transition:all 0.3s;
+  position:relative;z-index:1;
+}
+.menu-card:hover .card-icon{
+  background:rgba(201,168,76,0.2);
+  border-color:var(--gold);
   transform:scale(1.1);
 }
-.card h3{font-size:18px; font-weight:800; margin-bottom:8px;}
-.card p{font-size:14px; color:#777; font-weight:500;}
+.card-label{
+  color:var(--white);
+  font-size:16px;font-weight:700;
+  position:relative;z-index:1;
+}
+.card-sub{
+  color:var(--text-light);
+  font-size:12px;
+  position:relative;z-index:1;
+}
 
-/* Hide elements based on role */
-.admin-only { display: none; }
+/* Special add button */
+.add-btn{
+  position:fixed;
+  bottom:30px;left:30px;
+  background:var(--gold);
+  color:var(--maroon-dark);
+  border:none;
+  width:56px;height:56px;
+  border-radius:50%;
+  font-size:28px;font-weight:700;
+  cursor:pointer;
+  box-shadow:0 4px 20px rgba(201,168,76,0.5);
+  transition:all 0.3s;
+  z-index:200;
+  display:flex;align-items:center;justify-content:center;
+}
+.add-btn:hover{transform:scale(1.1) rotate(90deg);background:var(--gold-light)}
+
+/* Status bar */
+.status-bar{
+  background:rgba(0,0,0,0.3);
+  border-top:1px solid rgba(201,168,76,0.2);
+  padding:10px 40px;
+  display:flex;align-items:center;gap:30px;
+  position:fixed;bottom:0;left:0;right:0;
+  z-index:100;
+}
+.status-item{
+  display:flex;align-items:center;gap:8px;
+  color:var(--gold-light);
+  font-size:12px;font-weight:500;
+}
+.status-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:#4ade80;
+  box-shadow:0 0 8px #4ade80;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+@media(max-width:768px){
+  .menu-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-title{font-size:26px}
+  .header{padding:12px 20px}
+}
 </style>
 </head>
 <body>
 
-<div class="navbar">
-  <div class="brand">
-    <div class="icon">💰</div>
-    <h1>Cash Center</h1>
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">💰</div>
+    <div class="logo-text">
+      <h1>Cash Center</h1>
+      <p>YOUR BUSINESS . OUR SOLUTIONS</p>
+    </div>
   </div>
-  <div class="user-info">
-    <span id="userNameDisplay">جاري التحميل...</span>
-    <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
-  </div>
-</div>
-
-<div class="container">
-  <div class="welcome-sec">
-    <h2>مرحباً بك في النظام</h2>
-    <p>اختر من القائمة أدناه للبدء بالعمليات</p>
-  </div>
-
-  <div class="grid">
-    <!-- استلام -->
-    <a href="#" onclick="alert('واجهة الاستلام قيد البرمجة..')" class="card">
-      <div class="icon">📥</div>
-      <h3>الاستلام</h3>
-      <p>تسجيل عمليات استلام المبالغ</p>
-    </a>
-
-    <!-- سحب -->
-    <a href="#" onclick="alert('واجهة السحب قيد البرمجة..')" class="card">
-      <div class="icon">📤</div>
-      <h3>السحب</h3>
-      <p>تسجيل عمليات سحب المبالغ</p>
-    </a>
-
-    <!-- التقارير -->
-    <a href="#" onclick="alert('واجهة التقارير قيد البرمجة..')" class="card">
-      <div class="icon">📊</div>
-      <h3>التقارير</h3>
-      <p>كشوفات وإحصائيات مفصلة</p>
-    </a>
-
-    <!-- إدارة الموظفين (للمدير فقط) -->
-    <a href="admin_users.html" class="card admin-only" id="adminUsersCard">
-      <div class="icon">👥</div>
-      <h3>إدارة الموظفين</h3>
-      <p>إضافة، حذف وتعديل الصلاحيات</p>
-    </a>
+  <div class="header-right">
+    <div class="date-badge" id="dateBadge"></div>
+    <button class="user-btn">👤 تسجيل الدخول</button>
   </div>
 </div>
 
-<script src="auth_check.js"></script>
+<div class="hero">
+  <div class="hero-title">Your Business . Our Solutions .</div>
+  <div class="hero-sub">نظام إدارة مراكز النقد المتكامل</div>
+</div>
+
+<div class="ticker">
+  <div class="ticker-inner" id="tickerInner"></div>
+</div>
+
+<div class="menu-grid">
+  <a href="tarzeem.html" class="menu-card">
+    <div class="card-icon">📦</div>
+    <div class="card-label">الترزيم</div>
+    <div class="card-sub">إدارة حزم النقد</div>
+  </a>
+  <a href="istilam.html" class="menu-card">
+    <div class="card-icon">💵</div>
+    <div class="card-label">الاستلام النقدي</div>
+    <div class="card-sub">تسجيل عمليات الاستلام</div>
+  </a>
+  <a href="sahb.html" class="menu-card">
+    <div class="card-icon">🏧</div>
+    <div class="card-label">السحب النقدي</div>
+    <div class="card-sub">تسجيل عمليات السحب</div>
+  </a>
+  <a href="taqareer.html" class="menu-card">
+    <div class="card-icon">📊</div>
+    <div class="card-label">التقارير</div>
+    <div class="card-sub">تقارير شاملة ومفصلة</div>
+  </a>
+  <a href="tadqeeq_sahb.html" class="menu-card">
+    <div class="card-icon">🔍</div>
+    <div class="card-label">تدقيق السحب</div>
+    <div class="card-sub">مراجعة عمليات السحب</div>
+  </a>
+  <a href="tadqeeq_istilam.html" class="menu-card">
+    <div class="card-icon">✅</div>
+    <div class="card-label">تدقيق الاستلام</div>
+    <div class="card-sub">مراجعة عمليات الاستلام</div>
+  </a>
+  <a href="tasjeel_add.html" class="menu-card">
+    <div class="card-icon">📋</div>
+    <div class="card-label">تسجيل عد الاكياس</div>
+    <div class="card-sub">تسجيل نتائج العد</div>
+  </a>
+  <a href="tasjeel_naqdmaadood.html" class="menu-card">
+    <div class="card-icon">🖨️</div>
+    <div class="card-label">تسجيل النقد المعدود</div>
+    <div class="card-sub">تسجيل النقد المعدود</div>
+  </a>
+  <a href="taayeen.html" class="menu-card">
+    <div class="card-icon">⏱️</div>
+    <div class="card-label">تعيين الاكياس</div>
+    <div class="card-sub">تعيين وإدارة الاكياس</div>
+  </a>
+</div>
+
+<button class="add-btn" title="إضافة">+</button>
+
+<div class="status-bar">
+  <div class="status-item">
+    <div class="status-dot"></div>
+    <span>النظام يعمل</span>
+  </div>
+  <div class="status-item" id="statusDate"></div>
+  <div class="status-item" id="totalOps">📊 إجمالي العمليات اليوم: <span id="opsCount">0</span></div>
+</div>
+
 <script>
-// جلب بيانات المستخدم من الجلسة
-async function loadUserData() {
-  try {
-    const res = await fetch('api_auth.php?action=check');
-    const data = await res.json();
-    if(data.success && data.data.logged_in) {
-      const user = data.data.user;
-      document.getElementById('userNameDisplay').textContent = user.full_name + ' (' + getRoleName(user.role) + ')';
-      
-      // إظهار كارت الإدارة إذا كان المستخدم مدير
-      if(user.role === 'admin') {
-        document.getElementById('adminUsersCard').style.display = 'block';
-      }
-    } else {
-      location.href = 'login.html';
-    }
-  } catch(e) {
-    console.error(e);
-  }
+// Date
+function updateDate(){
+  const now = new Date();
+  const opts = {weekday:'long',year:'numeric',month:'long',day:'numeric'};
+  const ar = now.toLocaleDateString('ar-IQ', opts);
+  document.getElementById('dateBadge').textContent = ar;
+  document.getElementById('statusDate').textContent = '🕐 ' + now.toLocaleTimeString('ar-IQ');
 }
+updateDate();
+setInterval(updateDate, 1000);
 
-function getRoleName(role) {
-  switch(role) {
-    case 'admin': return 'مدير النظام';
-    case 'supervisor': return 'مشرف';
-    case 'auditor': return 'مدقق';
-    default: return 'موظف عادي';
-  }
-}
+// Ticker
+const tickerData = [
+  'إجمالي الاستلام اليوم: 2,815,281,020',
+  'نسبة استخدام الخزنة: 78%',
+  'آخر عملية استلام: 09:30 ص',
+  'عدد العمليات المعلقة: 3',
+  'آخر تدقيق: 08:45 ص',
+  'الحالة: جميع الأنظمة تعمل بشكل طبيعي',
+];
+const inner = document.getElementById('tickerInner');
+[...tickerData,...tickerData].forEach(t=>{
+  inner.innerHTML += `<span class="ticker-item"><span class="ticker-dot"></span>${t}</span>`;
+});
 
-async function logout() {
-  if(!confirm('هل أنت متأكد من تسجيل الخروج؟')) return;
-  const fd = new FormData();
-  fd.append('action', 'logout');
-  await fetch('api_auth.php', { method: 'POST', body: fd });
-  sessionStorage.removeItem('user');
-  location.href = 'login.html';
-}
-
-// تنفيذ عند تحميل الصفحة
-window.onload = loadUserData;
+// Ops count from localStorage
+document.getElementById('opsCount').textContent = localStorage.getItem('opsToday')||'0';
 </script>
 </body>
 </html>

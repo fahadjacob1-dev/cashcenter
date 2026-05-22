@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل النقد المعدود</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--maroon:#8B0045;--maroon-dark:#6B0035;--gold:#C9A84C;--gold-light:#E2C97E;--white:#fff}
+body{font-family:'Tajawal',sans-serif;background:var(--maroon);min-height:100vh;color:var(--white)}
+.topbar{background:var(--maroon-dark);border-bottom:2px solid var(--gold);padding:14px 30px;display:flex;align-items:center;justify-content:space-between}
+.topbar h2{font-size:20px;font-weight:800;color:var(--gold)}
+.back-btn{background:rgba(201,168,76,0.15);border:1px solid var(--gold);color:var(--gold);padding:8px 20px;border-radius:20px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.2s}
+.back-btn:hover{background:var(--gold);color:var(--maroon-dark)}
+.page{padding:24px 30px 80px;max-width:1000px;margin:0 auto}
+.card{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 24px;margin-bottom:16px}
+.card h3{color:var(--gold);font-size:15px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,0.2)}
+.fields-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.fields-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.field-group{display:flex;flex-direction:column;gap:6px}
+.field-group label{color:var(--gold-light);font-size:13px;font-weight:600}
+.field-group input,.field-group select{background:rgba(255,255,255,0.95);border:2px solid rgba(255,255,255,0.3);border-radius:8px;padding:9px 12px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:500;color:#333;direction:rtl;transition:border-color 0.2s}
+.field-group input:focus,.field-group select:focus{outline:none;border-color:var(--gold)}
+.ro{background:rgba(201,168,76,0.1)!important;border-color:rgba(201,168,76,0.3)!important;font-weight:800!important;text-align:center}
+
+/* Big table */
+.big-table{width:100%;border-collapse:collapse;margin-top:4px}
+.big-table th{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);color:var(--gold-light);font-size:12px;font-weight:700;padding:10px 8px;text-align:center}
+.big-table td{border:1px solid rgba(255,255,255,0.08);padding:6px 4px}
+.big-table td input[type="number"]{background:rgba(255,255,255,0.92);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:7px 8px;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;color:#333;text-align:center;width:100%;direction:ltr}
+.big-table td input[type="number"]:focus{outline:none;border-color:var(--gold)}
+.big-table td input.ro-td{background:rgba(255,255,255,0.6);cursor:default;color:#555}
+.big-table td.denom{background:rgba(201,168,76,0.1);color:var(--gold-light);font-size:13px;font-weight:700;text-align:left;padding-right:12px}
+.big-table td input[type="checkbox"]{width:18px;height:18px;cursor:pointer;accent-color:var(--gold)}
+.check-cell{text-align:center}
+
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--maroon-dark);border-top:2px solid var(--gold);padding:14px 30px;display:flex;align-items:center;justify-content:space-between}
+.total-display{display:flex;align-items:center;gap:16px}
+.total-label{color:var(--gold-light);font-size:14px;font-weight:600}
+.total-amount{color:var(--gold);font-size:22px;font-weight:800;margin:0 6px}
+.submit-btn{background:var(--gold);color:var(--maroon-dark);border:none;padding:12px 40px;border-radius:25px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(201,168,76,0.4)}
+.submit-btn:hover{background:var(--gold-light);transform:translateY(-2px)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h2>🖨️ تسجيل النقد المعدود</h2>
+  <a href="index.html" class="back-btn">→ الرئيسية</a>
+</div>
+<div class="page">
+  <div class="card">
+    <h3>بيانات العملية</h3>
+    <div class="fields-grid">
+      <div class="field-group">
+        <label>اسم الموظف</label>
+        <select><option value="">-- اختر --</option><option>أحمد محمد</option><option>علي حسن</option></select>
+      </div>
+      <div class="field-group">
+        <label>كلمة المرور</label>
+        <input type="password" placeholder="••••••">
+      </div>
+      <div class="field-group">
+        <label>رقم العملية</label>
+        <select id="opNum"><option value="">-- اختر --</option></select>
+      </div>
+      <div class="field-group">
+        <label>المبلغ الكلي</label>
+        <input type="text" id="totalAmt" class="ro" readonly value="0">
+      </div>
+      <div class="field-group">
+        <label>تاريخ العد</label>
+        <input type="datetime-local" id="countDate">
+      </div>
+      <div class="field-group">
+        <label>العملة</label>
+        <select><option>دينار</option><option>دولار</option><option>يورو</option></select>
+      </div>
+      <div class="field-group">
+        <label>عدد الاكياس</label>
+        <input type="number" id="bagsCount" value="0" min="0">
+      </div>
+      <div class="field-group">
+        <label>رقم الكيس</label>
+        <select id="bagSel"><option value="">-- اختر --</option></select>
+      </div>
+    </div>
+    <div class="fields-grid-3" style="margin-top:14px">
+      <div class="field-group">
+        <label>مبلغ الكيس</label>
+        <input type="text" id="bagAmt" class="ro" readonly value="0">
+      </div>
+      <div class="field-group">
+        <label>المبلغ الفعلي للكيس</label>
+        <input type="text" id="actualAmt" class="ro" readonly value="0">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>جدول الفئات والملاحظات</h3>
+    <div style="overflow-x:auto">
+      <table class="big-table">
+        <thead>
+          <tr>
+            <th style="width:80px">الفئة</th>
+            <th>النقص الفعلي</th>
+            <th>الزيادة الفعلية</th>
+            <th>المزيف</th>
+            <th>اختلاف أرقام</th>
+            <th>مكتب</th>
+            <th>محروق / مدفون</th>
+            <th>النقد التالف ذو قيمة</th>
+            <th>سوء الاستخدام</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+        <tfoot>
+          <tr>
+            <td class="denom" style="font-weight:800;color:var(--gold)">المجموع</td>
+            <td><input type="text" class="ro-td" id="sum1" readonly value="0"></td>
+            <td><input type="text" class="ro-td" id="sum2" readonly value="0"></td>
+            <td><input type="text" class="ro-td" id="sum3" readonly value="0"></td>
+            <td><input type="text" class="ro-td" id="sum4" readonly value="0"></td>
+            <td><input type="text" class="ro-td" id="sum5" readonly value="0"></td>
+            <td><input type="text" class="ro-td" id="sum6" readonly value="0"></td>
+            <td><input type="text" class="ro-td" id="sum7" readonly value="0"></td>
+            <td><input type="text" class="ro-td" id="sum8" readonly value="0"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-bar">
+  <div class="total-display">
+    <span class="total-label">المبلغ الفعلي:</span>
+    <span class="total-amount" id="grandActual">0</span>
+    <span class="total-label">دينار</span>
+  </div>
+  <button class="submit-btn" onclick="saveRecord()">تسجيل ＋</button>
+</div>
+
+<script>
+const DENOMS=[50000,25000,10000,5000,1000,500,250];
+const COLS=8;
+const now=new Date();
+document.getElementById('countDate').value=now.toISOString().slice(0,16);
+
+// Build table rows
+const tbody=document.getElementById('tableBody');
+DENOMS.forEach(d=>{
+  const tr=document.createElement('tr');
+  let cells=`<td class="denom">${d.toLocaleString('ar-IQ')}</td>`;
+  for(let i=0;i<COLS;i++){
+    cells+=`<td><input type="number" class="col-input" data-col="${i}" data-denom="${d}" value="0" min="0" oninput="calcSums()"></td>`;
+  }
+  tr.innerHTML=cells;
+  tbody.appendChild(tr);
+});
+
+// Bags count update
+document.getElementById('bagsCount').addEventListener('input',function(){
+  const sel=document.getElementById('bagSel');
+  sel.innerHTML='<option value="">-- اختر --</option>';
+  for(let i=1;i<=parseInt(this.value||0);i++){
+    sel.innerHTML+=`<option value="${i}">كيس ${i}</option>`;
+  }
+});
+
+function calcSums(){
+  for(let c=0;c<COLS;c++){
+    let s=0;
+    document.querySelectorAll(`.col-input[data-col="${c}"]`).forEach(i=>s+=parseInt(i.value)||0);
+    document.getElementById('sum'+(c+1)).value=s.toLocaleString('ar-IQ');
+  }
+}
+
+function saveRecord(){
+  alert('✅ تم تسجيل النقد المعدود بنجاح!');
+}
+
+// Load ops
+const records=JSON.parse(localStorage.getItem('istilamRecords')||'[]');
+const sel=document.getElementById('opNum');
+records.forEach(r=>{
+  const opt=document.createElement('option');
+  opt.value=r.id;opt.textContent='استلام - '+r.client+' ('+r.total+')';
+  sel.appendChild(opt);
+});
+sel.addEventListener('change',function(){
+  const r=records.find(x=>x.id==this.value);
+  if(r){document.getElementById('totalAmt').value=r.total;}
+});
+</script>
+</body>
+</html>

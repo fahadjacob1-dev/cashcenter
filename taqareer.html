@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقارير</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--maroon:#8B0045;--maroon-dark:#6B0035;--gold:#C9A84C;--gold-light:#E2C97E;--white:#fff}
+body{font-family:'Tajawal',sans-serif;background:var(--maroon);min-height:100vh;color:var(--white)}
+.topbar{background:var(--maroon-dark);border-bottom:2px solid var(--gold);padding:14px 30px;display:flex;align-items:center;justify-content:space-between}
+.topbar h2{font-size:20px;font-weight:800;color:var(--gold)}
+.back-btn{background:rgba(201,168,76,0.15);border:1px solid var(--gold);color:var(--gold);padding:8px 20px;border-radius:20px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.2s}
+.back-btn:hover{background:var(--gold);color:var(--maroon-dark)}
+.page{padding:32px 40px;max-width:900px;margin:0 auto}
+
+.filter-card{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;margin-bottom:32px}
+.filter-card h3{color:var(--gold);font-size:15px;font-weight:700;margin-bottom:18px}
+.date-row{display:flex;align-items:center;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.date-row label{color:var(--gold-light);font-size:13px;font-weight:600;white-space:nowrap}
+.date-row input[type="date"]{background:rgba(255,255,255,0.95);border:2px solid rgba(255,255,255,0.3);border-radius:8px;padding:9px 12px;font-family:'Tajawal',sans-serif;font-size:14px;color:#333;direction:rtl;transition:border-color 0.2s}
+.date-row input:focus{outline:none;border-color:var(--gold)}
+
+.curr-row{display:flex;align-items:center;gap:24px;margin-bottom:8px}
+.curr-option{display:flex;align-items:center;gap:8px;cursor:pointer}
+.curr-option input[type="radio"]{width:18px;height:18px;accent-color:var(--gold);cursor:pointer}
+.curr-option span{color:var(--white);font-size:15px;font-weight:600}
+
+.reports-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.report-btn{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:16px;
+  padding:28px 20px;
+  text-align:center;
+  cursor:pointer;
+  transition:all 0.3s;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+.report-btn:hover{
+  background:rgba(201,168,76,0.12);
+  border-color:var(--gold);
+  transform:translateY(-4px);
+  box-shadow:0 8px 30px rgba(0,0,0,0.3);
+}
+.report-icon{font-size:36px}
+.report-label{color:var(--white);font-size:16px;font-weight:700}
+.report-sub{color:rgba(255,255,255,0.6);font-size:12px}
+
+/* Results table */
+.results-section{margin-top:28px;display:none}
+.results-section h3{color:var(--gold);font-size:15px;font-weight:700;margin-bottom:12px}
+.results-table{width:100%;border-collapse:collapse}
+.results-table th{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);color:var(--gold-light);font-size:13px;font-weight:700;padding:10px 12px;text-align:center}
+.results-table td{border:1px solid rgba(255,255,255,0.06);padding:10px 12px;font-size:13px;color:rgba(255,255,255,0.85);text-align:center}
+.results-table tr:hover td{background:rgba(201,168,76,0.05)}
+.badge{display:inline-block;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:700}
+.badge-green{background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.3)}
+.badge-red{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h2>📊 التقارير</h2>
+  <a href="index.html" class="back-btn">→ الرئيسية</a>
+</div>
+<div class="page">
+  <div class="filter-card">
+    <h3>🔍 فلترة التقارير</h3>
+    <div class="date-row">
+      <label>من تاريخ</label>
+      <input type="date" id="dateFrom">
+      <label>إلى تاريخ</label>
+      <input type="date" id="dateTo">
+    </div>
+    <div class="curr-row">
+      <label class="curr-option"><input type="radio" name="curr" value="دينار" checked><span>دينار</span></label>
+      <label class="curr-option"><input type="radio" name="curr" value="دولار"><span>دولار</span></label>
+      <label class="curr-option"><input type="radio" name="curr" value="يورو"><span>يورو</span></label>
+    </div>
+  </div>
+
+  <div class="reports-grid">
+    <div class="report-btn" onclick="showReport('ايداع')">
+      <div class="report-icon">🏦</div>
+      <div class="report-label">الإيداع</div>
+      <div class="report-sub">تقرير عمليات الإيداع</div>
+    </div>
+    <div class="report-btn" onclick="showReport('سحب')">
+      <div class="report-icon">🏧</div>
+      <div class="report-label">السحب</div>
+      <div class="report-sub">تقرير عمليات السحب</div>
+    </div>
+    <div class="report-btn" onclick="showReport('تفصيل العروقات')">
+      <div class="report-icon">📋</div>
+      <div class="report-label">تفصيل العروقات</div>
+      <div class="report-sub">تفاصيل العروقات النقدية</div>
+    </div>
+    <div class="report-btn" onclick="showReport('ملخص العروقات')">
+      <div class="report-icon">📊</div>
+      <div class="report-label">ملخص العروقات</div>
+      <div class="report-sub">ملخص إجمالي للعروقات</div>
+    </div>
+    <div class="report-btn" onclick="showReport('جرد النقد الكلي')">
+      <div class="report-icon">💰</div>
+      <div class="report-label">جرد النقد الكلي</div>
+      <div class="report-sub">جرد شامل للنقد</div>
+    </div>
+    <div class="report-btn" onclick="showReport('تعيين الاكياس')">
+      <div class="report-icon">📦</div>
+      <div class="report-label">تعيين الاكياس</div>
+      <div class="report-sub">تقرير تعيين الاكياس</div>
+    </div>
+    <div class="report-btn" onclick="showReport('التدقيق الداخلي')">
+      <div class="report-icon">✅</div>
+      <div class="report-label">التدقيق الداخلي</div>
+      <div class="report-sub">نتائج التدقيق الداخلي</div>
+    </div>
+    <div class="report-btn" onclick="showReport('ملخص العد لفترة زمنية')">
+      <div class="report-icon">⏱️</div>
+      <div class="report-label">ملخص العد لفترة زمنية</div>
+      <div class="report-sub">ملخص نتائج العد</div>
+    </div>
+  </div>
+
+  <div class="results-section" id="resultsSection">
+    <h3 id="resultsTitle">نتائج التقرير</h3>
+    <table class="results-table" id="resultsTable">
+      <thead id="resultsHead"></thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// Set default dates
+const now=new Date();
+const today=now.toISOString().split('T')[0];
+document.getElementById('dateFrom').value=today;
+document.getElementById('dateTo').value=today;
+
+function showReport(type){
+  const sec=document.getElementById('resultsSection');
+  sec.style.display='block';
+  document.getElementById('resultsTitle').textContent='📊 تقرير '+type;
+
+  const headers={
+    'ايداع':['رقم الإيداع','العميل','التاريخ','العملة','المبلغ','الحالة'],
+    'سحب':['رقم السحب','العميل','التاريخ','العملة','المبلغ','الحالة'],
+    'تفصيل العروقات':['رقم العملية','النوع','الفئة','العدد','القيمة','الملاحظة'],
+    'ملخص العروقات':['النوع','إجمالي المبلغ','عدد العمليات','المتوسط'],
+    'جرد النقد الكلي':['الفئة','الكمية','القيمة الكلية'],
+    'تعيين الاكياس':['رقم الكيس','العملية','الموظف','ماكنة العد','التاريخ'],
+    'التدقيق الداخلي':['العملية','المدقق','التاريخ','النتيجة','الملاحظات'],
+    'ملخص العد لفترة زمنية':['الفترة','عدد العمليات','إجمالي المبلغ','المتوسط'],
+  };
+  const cols=headers[type]||['رقم','التفاصيل','التاريخ','المبلغ','الحالة'];
+
+  document.getElementById('resultsHead').innerHTML='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+
+  // Sample data
+  const records=JSON.parse(localStorage.getItem('istilamRecords')||'[]');
+  const body=document.getElementById('resultsBody');
+  body.innerHTML='';
+
+  if(records.length===0){
+    body.innerHTML=`<tr><td colspan="${cols.length}" style="color:rgba(255,255,255,0.4);padding:20px">لا توجد بيانات للعرض</td></tr>`;
+  } else {
+    records.forEach(r=>{
+      body.innerHTML+=`<tr>
+        <td>${r.id}</td>
+        <td>${r.client||'-'}</td>
+        <td>${r.date||'-'}</td>
+        <td>${r.currency||'دينار'}</td>
+        <td>${r.total||'0'}</td>
+        <td><span class="badge badge-green">مكتمل</span></td>
+      </tr>`;
+    });
+  }
+  sec.scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>

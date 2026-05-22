@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تعيين الاكياس</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--maroon:#8B0045;--maroon-dark:#6B0035;--gold:#C9A84C;--gold-light:#E2C97E;--white:#fff}
+body{font-family:'Tajawal',sans-serif;background:var(--maroon);min-height:100vh;color:var(--white)}
+.topbar{background:var(--maroon-dark);border-bottom:2px solid var(--gold);padding:14px 30px;display:flex;align-items:center;justify-content:space-between}
+.topbar h2{font-size:20px;font-weight:800;color:var(--gold)}
+.back-btn{background:rgba(201,168,76,0.15);border:1px solid var(--gold);color:var(--gold);padding:8px 20px;border-radius:20px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.2s}
+.back-btn:hover{background:var(--gold);color:var(--maroon-dark)}
+.page{padding:24px 30px 80px;max-width:700px;margin:0 auto}
+.card{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 24px;margin-bottom:16px}
+.card h3{color:var(--gold);font-size:15px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,0.2)}
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field-group{display:flex;flex-direction:column;gap:6px}
+.field-group label{color:var(--gold-light);font-size:13px;font-weight:600}
+.field-group input,.field-group select{background:rgba(255,255,255,0.95);border:2px solid rgba(255,255,255,0.3);border-radius:8px;padding:9px 12px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:500;color:#333;direction:rtl;transition:border-color 0.2s}
+.field-group input:focus,.field-group select:focus{outline:none;border-color:var(--gold)}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--maroon-dark);border-top:2px solid var(--gold);padding:14px 30px;display:flex;justify-content:flex-start}
+.submit-btn{background:var(--gold);color:var(--maroon-dark);border:none;padding:12px 50px;border-radius:25px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(201,168,76,0.4)}
+.submit-btn:hover{background:var(--gold-light);transform:translateY(-2px)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h2>⏱️ تعيين الاكياس</h2>
+  <a href="index.html" class="back-btn">→ الرئيسية</a>
+</div>
+<div class="page">
+  <div class="card">
+    <h3>بيانات الموظف</h3>
+    <div class="fields-grid">
+      <div class="field-group">
+        <label>اسم الموظف</label>
+        <select><option value="">-- اختر --</option><option>أحمد محمد</option><option>علي حسن</option></select>
+      </div>
+      <div class="field-group">
+        <label>كلمة المرور</label>
+        <input type="password" placeholder="••••••">
+      </div>
+      <div class="field-group">
+        <label>اسم موظف العد</label>
+        <select><option value="">-- اختر --</option><option>محمد علي</option><option>سعد كريم</option></select>
+      </div>
+      <div class="field-group">
+        <label>رقم الإيداع</label>
+        <select id="opNum"><option value="">-- اختر --</option></select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>بيانات الأجهزة</h3>
+    <div class="fields-grid">
+      <div class="field-group">
+        <label>رقم الكيس</label>
+        <select><option value="">-- اختر --</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+      </div>
+      <div class="field-group">
+        <label>رقم ماكنة العد</label>
+        <select><option value="">-- اختر --</option><option>M-001</option><option>M-002</option><option>M-003</option></select>
+      </div>
+      <div class="field-group">
+        <label>رقم كاميرا العد</label>
+        <select><option value="">-- اختر --</option><option>C-001</option><option>C-002</option></select>
+      </div>
+      <div class="field-group">
+        <label>رقم ماكنة اعادة العد</label>
+        <select><option value="">-- اختر --</option><option>M-001</option><option>M-002</option></select>
+      </div>
+      <div class="field-group">
+        <label>رقم كاميرا اعادة العد</label>
+        <select><option value="">-- اختر --</option><option>C-001</option><option>C-002</option></select>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="bottom-bar">
+  <button class="submit-btn" onclick="alert('✅ تم تعيين الاكياس بنجاح!')">تعيين ✓</button>
+</div>
+<script>
+// Populate op numbers from localStorage
+const records=JSON.parse(localStorage.getItem('istilamRecords')||'[]');
+const sel=document.getElementById('opNum');
+records.forEach(r=>{
+  const opt=document.createElement('option');
+  opt.value=r.id;opt.textContent=r.id+' - '+r.client;
+  sel.appendChild(opt);
+});
+</script>
+</body>
+</html>
