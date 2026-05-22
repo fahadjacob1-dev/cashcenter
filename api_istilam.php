@@ -51,48 +51,75 @@ switch ($action) {
         $currency  = $_POST['currency']   ?? 'دينار';
         $bags      = (int)($_POST['bags_count']  ?? 0);
         $liquidity = (float)($_POST['liquidity'] ?? 0);
-        $d50000    = (int)($_POST['d50000']  ?? 0);
-        $d25000    = (int)($_POST['d25000']  ?? 0);
-        $d10000    = (int)($_POST['d10000']  ?? 0);
-        $d5000     = (int)($_POST['d5000']   ?? 0);
-        $d1000     = (int)($_POST['d1000']   ?? 0);
-        $d500      = (int)($_POST['d500']    ?? 0);
-        $d250      = (int)($_POST['d250']    ?? 0);
+        
+        $bags_data_json = $_POST['bags_data'] ?? '[]';
+        $bags_array = json_decode($bags_data_json, true) ?: [];
 
-        // Validation
         if (!$emp_id || !$client_id || !$op_date) {
             json_error('الموظف والعميل والتاريخ مطلوبة');
         }
 
-        // حساب المجموع
-        $total = ($d50000 * 50000) + ($d25000 * 25000) + ($d10000 * 10000)
-               + ($d5000  *  5000) + ($d1000  *  1000) + ($d500   *   500)
-               + ($d250   *   250);
+        // Calculate totals from the bags_array
+        $d50000 = $d25000 = $d10000 = $d5000 = $d1000 = $d500 = $d250 = $total = 0;
+        foreach($bags_array as $b) {
+            $d50000 += (int)($b['d50000'] ?? 0);
+            $d25000 += (int)($b['d25000'] ?? 0);
+            $d10000 += (int)($b['d10000'] ?? 0);
+            $d5000  += (int)($b['d5000']  ?? 0);
+            $d1000  += (int)($b['d1000']  ?? 0);
+            $d500   += (int)($b['d500']   ?? 0);
+            $d250   += (int)($b['d250']   ?? 0);
+            $total  += (float)($b['total_amount'] ?? 0);
+        }
 
         $valid_currencies = ['دينار', 'دولار', 'يورو'];
         if (!in_array($currency, $valid_currencies, true)) json_error('عملة غير صالحة');
 
         $op_num = generate_op_num('IST');
 
-        $stmt = $conn->prepare(
-            'INSERT INTO istilam
-             (op_num, emp_id, client_id, op_date, currency, total_amount, bags_count, liquidity,
-              d50000, d25000, d10000, d5000, d1000, d500, d250)
-             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
-        );
-        $stmt->bind_param(
-            'siissddiiiiiiii',
-            $op_num, $emp_id, $client_id, $op_date, $currency,
-            $total, $bags, $liquidity,
-            $d50000, $d25000, $d10000, $d5000, $d1000, $d500, $d250
-        );
-
-        if ($stmt->execute()) {
+        $conn->begin_transaction();
+        try {
+            $stmt = $conn->prepare(
+                'INSERT INTO istilam
+                 (op_num, emp_id, client_id, op_date, currency, total_amount, bags_count, liquidity,
+                  d50000, d25000, d10000, d5000, d1000, d500, d250)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+            );
+            $stmt->bind_param(
+                'siissddiiiiiiii',
+                $op_num, $emp_id, $client_id, $op_date, $currency,
+                $total, $bags, $liquidity,
+                $d50000, $d25000, $d10000, $d5000, $d1000, $d500, $d250
+            );
+            $stmt->execute();
             $new_id = (int)$conn->insert_id;
+
+            // Insert bags
+            $bag_stmt = $conn->prepare(
+                'INSERT INTO istilam_bags 
+                 (istilam_id, bag_num, d50000, d25000, d10000, d5000, d1000, d500, d250, total_amount)
+                 VALUES (?,?,?,?,?,?,?,?,?,?)'
+            );
+            foreach($bags_array as $idx => $b) {
+                $bnum = $idx + 1;
+                $bd50000 = (int)($b['d50000'] ?? 0);
+                $bd25000 = (int)($b['d25000'] ?? 0);
+                $bd10000 = (int)($b['d10000'] ?? 0);
+                $bd5000  = (int)($b['d5000']  ?? 0);
+                $bd1000  = (int)($b['d1000']  ?? 0);
+                $bd500   = (int)($b['d500']   ?? 0);
+                $bd250   = (int)($b['d250']   ?? 0);
+                $btot    = (float)($b['total_amount'] ?? 0);
+                $bag_stmt->bind_param('iiiiiiiiid', $new_id, $bnum, $bd50000, $bd25000, $bd10000, $bd5000, $bd1000, $bd500, $bd250, $btot);
+                $bag_stmt->execute();
+            }
+
+            $conn->commit();
             log_action('istilam_save', 'istilam', $new_id);
             json_success(['id' => $new_id, 'op_num' => $op_num], 'تم حفظ عملية الاستلام بنجاح');
-        } else {
-            json_error('حدث خطأ أثناء الحفظ');
+        } catch (Exception $e) {
+            $conn->rollback();
+            json_error('حدث خطأ أثناء الحفظ: ' . $e->getMessage());
         }
         break;
 

@@ -52,7 +52,10 @@ body{font-family:'Tajawal',sans-serif;background:var(--maroon);min-height:100vh;
         <label>اسم الموظف</label>
         <select id="empName">
           <option value="">-- اختر --</option>
-          <option>أحمد محمد</option><option>علي حسن</option><option>سارة خالد</option>
+          <option value="1">المدير العام</option>
+          <option value="2">أحمد محمد</option>
+          <option value="3">علي حسن</option>
+          <option value="4">سارة خالد</option>
         </select>
       </div>
       <div class="field-group">
@@ -67,7 +70,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--maroon);min-height:100vh;
         <label>اسم العميل</label>
         <select id="clientName">
           <option value="">-- اختر --</option>
-          <option>البنك الأهلي</option><option>المصرف العربي</option><option>بنك بغداد</option>
+          <option value="1">البنك الأهلي</option>
+          <option value="2">المصرف العربي</option>
+          <option value="3">بنك بغداد</option>
+          <option value="4">مصرف الرشيد</option>
+          <option value="5">مصرف الرافدين</option>
         </select>
       </div>
       <div class="field-group">
@@ -147,8 +154,8 @@ function saveRecord(){
   const formData=new FormData();
   formData.append('action','save');
   formData.append('op_num',document.getElementById('opNum').value);
-  formData.append('emp_name',emp);
-  formData.append('client_name',document.getElementById('clientName').value);
+  formData.append('emp_id',emp);
+  formData.append('client_id',document.getElementById('clientName').value);
   formData.append('op_date',document.getElementById('opDate').value);
   formData.append('currency',document.getElementById('currency').value);
   formData.append('total_amount',total);
@@ -166,7 +173,7 @@ function saveRecord(){
         calcTotal();
         document.getElementById('opNum').value=Math.floor(1000+Math.random()*9000);
       } else {
-        alert('خطأ: '+data.message);
+        alert('خطأ: ' + (data.error || data.message || 'حدث خطأ غير معروف'));
       }
     })
     .catch(()=>alert('تعذر الاتصال بالسيرفر'));

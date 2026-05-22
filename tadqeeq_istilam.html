@@ -3,200 +3,304 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تدقيق الاستلام</title>
+<title>تدقيق الاستلام النقدي</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--maroon:#8B0045;--maroon-dark:#6B0035;--gold:#C9A84C;--gold-light:#E2C97E;--white:#fff}
 body{font-family:'Tajawal',sans-serif;background:var(--maroon);min-height:100vh;color:var(--white)}
+
+@media print {
+    body * { visibility: hidden; }
+    #printArea, #printArea * { visibility: visible; }
+    #printArea { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; padding: 20px;}
+    .page, .topbar, .bottom-bar { display: none !important; }
+}
+
 .topbar{background:var(--maroon-dark);border-bottom:2px solid var(--gold);padding:14px 30px;display:flex;align-items:center;justify-content:space-between}
 .topbar h2{font-size:20px;font-weight:800;color:var(--gold)}
 .back-btn{background:rgba(201,168,76,0.15);border:1px solid var(--gold);color:var(--gold);padding:8px 20px;border-radius:20px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.2s}
 .back-btn:hover{background:var(--gold);color:var(--maroon-dark)}
+
 .page{padding:24px 30px 80px;max-width:900px;margin:0 auto}
 
-/* Search section */
-.search-card{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 24px;margin-bottom:20px}
-.search-card h3{color:var(--gold);font-size:15px;font-weight:700;margin-bottom:14px}
+.card{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px 24px;margin-bottom:20px}
+.card h3{color:var(--gold);font-size:16px;font-weight:700;margin-bottom:14px}
 .search-row{display:flex;gap:12px;align-items:flex-end}
 .field-group{display:flex;flex-direction:column;gap:6px;flex:1}
 .field-group label{color:var(--gold-light);font-size:13px;font-weight:600}
-.field-group input,.field-group select{background:rgba(255,255,255,0.95);border:2px solid rgba(255,255,255,0.3);border-radius:8px;padding:9px 12px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:500;color:#333;direction:rtl;transition:border-color 0.2s}
-.field-group input:focus{outline:none;border-color:var(--gold)}
-.search-btn{background:var(--gold);color:var(--maroon-dark);border:none;padding:10px 24px;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;height:40px}
-.search-btn:hover{background:var(--gold-light)}
+.field-group input, .field-group select{background:rgba(255,255,255,0.95);border:2px solid rgba(255,255,255,0.3);border-radius:8px;padding:9px 12px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:500;color:#333;direction:rtl;transition:border-color 0.2s}
+.field-group input:focus, .field-group select:focus{outline:none;border-color:var(--gold)}
 
-/* Info section */
+.btn{background:var(--gold);color:var(--maroon-dark);border:none;padding:10px 24px;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;height:40px}
+.btn:hover{background:var(--gold-light)}
+
 .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
 .info-item{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 16px}
 .info-item label{color:var(--gold-light);font-size:12px;font-weight:600;display:block;margin-bottom:4px}
 .info-item span{color:var(--white);font-size:14px;font-weight:700}
 
-/* Bags section */
-.bags-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.bags-header h3{color:var(--gold);font-size:15px;font-weight:700}
-.bag-nav{display:flex;align-items:center;gap:12px}
-.bag-nav button{background:rgba(201,168,76,0.15);border:1px solid var(--gold);color:var(--gold);padding:6px 16px;border-radius:8px;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s}
-.bag-nav button:hover{background:var(--gold);color:var(--maroon-dark)}
-.bag-counter{color:var(--gold-light);font-size:13px;font-weight:600}
-
-.bag-card{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:20px}
-.table-header{display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px}
-.table-header span{background:rgba(0,0,0,0.25);border:1px solid rgba(201,168,76,0.3);color:var(--gold-light);font-size:13px;font-weight:700;padding:10px;border-radius:8px;text-align:center}
+.bags-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; border-bottom: 1px solid rgba(201,168,76,0.3); padding-bottom: 10px;}
+.bags-header h3{color:var(--gold);font-size:16px;font-weight:700}
 .currency-row{display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;margin-bottom:8px;align-items:center}
 .denom-label{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);color:var(--gold-light);font-size:14px;font-weight:700;padding:10px;border-radius:8px;text-align:center}
-.currency-row input{background:rgba(255,255,255,0.95);border:2px solid rgba(255,255,255,0.2);border-radius:8px;padding:10px 12px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;color:#333;text-align:center;direction:ltr;transition:all 0.2s}
-.currency-row input:focus{outline:none;border-color:var(--gold)}
+.currency-row input{background:rgba(255,255,255,0.95);border:2px solid rgba(255,255,255,0.2);border-radius:8px;padding:10px 12px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;color:#333;text-align:center;direction:ltr;}
 .readonly-input{background:rgba(255,255,255,0.7)!important;cursor:default!important;color:#555!important}
 
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--maroon-dark);border-top:2px solid var(--gold);padding:14px 30px;display:flex;align-items:center;justify-content:space-between}
-.total-display{display:flex;align-items:center;gap:16px}
-.total-label{color:var(--gold-light);font-size:14px;font-weight:600}
-.total-amount{color:var(--gold);font-size:24px;font-weight:800}
-.submit-btn{background:var(--gold);color:var(--maroon-dark);border:none;padding:12px 40px;border-radius:25px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(201,168,76,0.4)}
-.submit-btn:hover{background:var(--gold-light);transform:translateY(-2px)}
-.hidden{display:none}
+.msg{position:fixed;top:80px;right:30px;background:#22c55e;color:#fff;padding:14px 24px;border-radius:12px;font-size:15px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:none;z-index:999}
+.error-msg{background:#ef4444;}
+
+/* Print Area (Deposit Receipt) */
+#printArea { display: none; width: 800px; margin: 0 auto; border: 1px solid #ccc; font-family: 'Tajawal', sans-serif; direction: rtl; }
+.print-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+.print-title { font-size: 24px; font-weight: bold; }
+.print-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.print-item { font-size: 16px; }
+.print-item strong { margin-left: 10px; }
+.print-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.print-table th, .print-table td { border: 1px solid #000; padding: 10px; text-align: center; }
+.print-footer { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px dashed #ccc; }
+.signature-box { text-align: center; width: 200px; }
 </style>
 </head>
 <body>
 <div class="topbar">
-  <h2>✅ تدقيق الاستلام</h2>
+  <h2>✅ تدقيق الاستلام - جرد أعمى</h2>
   <a href="index.html" class="back-btn">→ الرئيسية</a>
 </div>
+
 <div class="page">
   <!-- Search -->
-  <div class="search-card">
+  <div class="card">
     <h3>🔍 البحث برقم الإيداع</h3>
     <div class="search-row">
       <div class="field-group">
-        <label>اسم الموظف</label>
-        <select id="empName">
-          <option value="">-- اختر --</option>
-          <option>أحمد محمد</option><option>علي حسن</option><option>سارة خالد</option>
-        </select>
-      </div>
-      <div class="field-group">
-        <label>كلمة المرور</label>
-        <input type="password" placeholder="••••••">
-      </div>
-      <div class="field-group">
         <label>رقم الإيداع</label>
-        <input type="text" id="searchNum" placeholder="أدخل رقم الإيداع">
+        <input type="text" id="searchNum" placeholder="مثال: IST-XXXXXX">
       </div>
-      <button class="search-btn" onclick="searchRecord()">🔍 بحث</button>
-    </div>
-    <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
-      <label style="color:var(--gold-light);font-size:13px">الاكياس المطابقة من</label>
-      <input type="number" id="bagFrom" style="background:rgba(255,255,255,0.95);border:2px solid rgba(255,255,255,0.3);border-radius:8px;padding:7px 10px;font-family:Tajawal,sans-serif;font-size:14px;color:#333;width:80px;text-align:center" value="1" min="1">
-      <label style="color:var(--gold-light);font-size:13px">إلى</label>
-      <input type="number" id="bagTo" style="background:rgba(255,255,255,0.95);border:2px solid rgba(255,255,255,0.3);border-radius:8px;padding:7px 10px;font-family:Tajawal,sans-serif;font-size:14px;color:#333;width:80px;text-align:center" value="5" min="1">
+      <button class="btn" onclick="searchRecord()">🔍 بحث وجلب البيانات</button>
     </div>
   </div>
 
   <!-- Info (hidden until search) -->
-  <div class="info-grid hidden" id="infoSection">
+  <div class="info-grid" id="infoSection" style="display:none;">
     <div class="info-item"><label>رقم الإيداع</label><span id="dispOpNum">-</span></div>
     <div class="info-item"><label>اسم العميل</label><span id="dispClient">-</span></div>
+    <div class="info-item"><label>اسم الموظف</label><span id="dispEmp">-</span></div>
     <div class="info-item"><label>تاريخ الإيداع</label><span id="dispDate">-</span></div>
     <div class="info-item"><label>نوع العملة</label><span id="dispCurrency">-</span></div>
-    <div class="info-item"><label>المبلغ الكلي</label><span id="dispTotal">-</span></div>
-    <div class="info-item"><label>عدد الاكياس</label><span id="dispBags">-</span></div>
+    <div class="info-item"><label>عدد الأكياس</label><span id="dispBags">-</span></div>
   </div>
 
-  <!-- Bags (hidden until search) -->
-  <div class="hidden" id="bagsSection">
+  <!-- Bag Audit Entry -->
+  <div class="card" id="auditSection" style="display:none;">
     <div class="bags-header">
-      <h3>📦 تدقيق الكيس</h3>
-      <div class="bag-nav">
-        <button onclick="prevBag()">→ السابق</button>
-        <span class="bag-counter" id="bagCounter">كيس 1 من 5</span>
-        <button onclick="nextBag()">التالي ←</button>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <h3>📦 جرد الكيس رقم:</h3>
+        <input type="number" id="auditBagNum" value="1" min="1" style="width: 80px; text-align: center; font-size: 16px; border-radius: 8px; border: 2px solid var(--gold); padding: 5px;">
       </div>
     </div>
-    <div class="bag-card">
-      <div class="table-header">
-        <span>الفئة</span>
-        <span>عدد الأوراق</span>
-        <span>القيمة</span>
-      </div>
-      <div id="bagRows"></div>
+    
+    <div style="display: grid; grid-template-columns: 120px 1fr 1fr; gap: 8px; margin-bottom: 8px; padding: 0 8px;">
+      <span style="color:var(--gold-light); font-size:13px; font-weight:700; text-align:center;">الفئة</span>
+      <span style="color:var(--gold-light); font-size:13px; font-weight:700; text-align:center;">أدخل عدد الأوراق</span>
+      <span style="color:var(--gold-light); font-size:13px; font-weight:700; text-align:center;">القيمة</span>
+    </div>
+    
+    <div id="currencyRows"></div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+      <div style="font-size: 18px; font-weight: bold; color: var(--gold);">مجموع الكيس: <span id="bagTotal">0</span></div>
+      <button class="btn" onclick="saveAudit()" style="background: #22c55e; color: #fff; font-size: 16px; padding: 10px 40px;">إرسال الجرد للتدقيق والمطابقة ✓</button>
     </div>
   </div>
 </div>
 
-<div class="bottom-bar">
-  <div class="total-display">
-    <span class="total-label">مجموع الكيس:</span>
-    <span class="total-amount" id="bagTotal">0</span>
-    <span class="total-label">دينار</span>
+<!-- Print Deposit Receipt (إشعار إيداع) -->
+<div id="printArea">
+  <div class="print-header">
+    <div class="print-title">إشعار إيداع نقدي (مُدقق)</div>
+    <div style="font-size: 14px; margin-top: 5px;">Cash Center System</div>
   </div>
-  <button class="submit-btn" onclick="saveTadqeeq()">تدقيق ✓</button>
+  
+  <div class="print-grid">
+    <div class="print-item"><strong>رقم العملية:</strong> <span id="pOpNum">-</span></div>
+    <div class="print-item"><strong>التاريخ:</strong> <span id="pDate">-</span></div>
+    <div class="print-item"><strong>العميل:</strong> <span id="pClient">-</span></div>
+    <div class="print-item"><strong>أمين الصندوق (المستلم):</strong> <span id="pEmp">-</span></div>
+    <div class="print-item"><strong>العملة:</strong> <span id="pCurrency">-</span></div>
+    <div class="print-item"><strong>الكيس المدقق:</strong> <span id="pBagNum">-</span></div>
+  </div>
+  
+  <table class="print-table">
+    <thead>
+      <tr>
+        <th>الفئة</th>
+        <th>العدد</th>
+        <th>المبلغ</th>
+      </tr>
+    </thead>
+    <tbody id="pTableBody"></tbody>
+  </table>
+  
+  <div style="text-align: left; font-size: 20px; font-weight: bold; margin-top: 10px;">
+    المجموع الكلي المودع للكيس: <span id="pTotal">0</span>
+  </div>
+  
+  <div class="print-footer">
+    <div class="signature-box">
+      توقيع المستلم<br><br>___________________
+    </div>
+    <div class="signature-box">
+      توقيع المدقق<br><br>___________________
+    </div>
+    <div class="signature-box">
+      ختم المركز<br><br>___________________
+    </div>
+  </div>
 </div>
+
+<div class="msg" id="msgBox"></div>
 
 <script>
-const DENOMS=[50000,25000,10000,5000,1000,500,250];
-let currentBag=1, totalBags=5;
+let currentIstilamId = null;
+let currentCurrency = 'دينار';
+let currencyDenoms = {
+  'دينار': [50000, 25000, 10000, 5000, 1000, 500, 250],
+  'دولار': [100, 50, 20, 10, 5, 2, 1],
+  'يورو': [500, 200, 100, 50, 20, 10, 5]
+};
 
-function buildBagRows(){
-  const rows=document.getElementById('bagRows');
-  rows.innerHTML='';
-  DENOMS.forEach(d=>{
-    const row=document.createElement('div');
-    row.className='currency-row';
-    row.innerHTML=`
+function showMsg(text, isError=false) {
+  const box = document.getElementById('msgBox');
+  box.textContent = text;
+  box.className = 'msg ' + (isError ? 'error-msg' : '');
+  box.style.display = 'block';
+  setTimeout(()=>box.style.display='none', 4000);
+}
+
+function searchRecord() {
+  const num = document.getElementById('searchNum').value.trim();
+  if(!num) { showMsg('يرجى إدخال رقم الإيداع', true); return; }
+  
+  fetch(`api_tadqeeq.php?action=get_istilam_info&op_num=${encodeURIComponent(num)}`)
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.success) {
+        const info = data.data;
+        currentIstilamId = info.id;
+        currentCurrency = info.currency;
+        
+        document.getElementById('dispOpNum').textContent = info.op_num;
+        document.getElementById('dispClient').textContent = info.client_name;
+        document.getElementById('dispEmp').textContent = info.emp_name;
+        document.getElementById('dispDate').textContent = info.op_date;
+        document.getElementById('dispCurrency').textContent = info.currency;
+        document.getElementById('dispBags').textContent = info.bags_count;
+        
+        document.getElementById('infoSection').style.display = 'grid';
+        document.getElementById('auditSection').style.display = 'block';
+        
+        buildBagRows();
+        showMsg('تم جلب البيانات بنجاح');
+      } else {
+        showMsg('خطأ: ' + (data.error || 'العملية غير موجودة'), true);
+        document.getElementById('infoSection').style.display = 'none';
+        document.getElementById('auditSection').style.display = 'none';
+      }
+    }).catch(()=>showMsg('تعذر الاتصال بالسيرفر', true));
+}
+
+function buildBagRows() {
+  const rows = document.getElementById('currencyRows');
+  rows.innerHTML = '';
+  document.getElementById('bagTotal').textContent = '0';
+  const denoms = currencyDenoms[currentCurrency] || currencyDenoms['دينار'];
+  
+  denoms.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'currency-row';
+    row.innerHTML = `
       <div class="denom-label">${d.toLocaleString('ar-IQ')}</div>
-      <input type="number" class="count-input" data-denom="${d}" value="0" min="0" oninput="calcBagTotal(this)">
-      <input type="text" class="readonly-input" id="bval_${d}" value="0" readonly>
+      <input type="number" class="count-input" id="inp_${d}" data-denom="${d}" value="0" min="0" oninput="calcBagTotal()">
+      <input type="text" class="readonly-input" id="val_${d}" value="0" readonly>
     `;
     rows.appendChild(row);
   });
 }
 
-function calcBagTotal(input){
-  const val=parseInt(input.dataset.denom)*(parseInt(input.value)||0);
-  document.getElementById('bval_'+input.dataset.denom).value=val.toLocaleString('ar-IQ');
-  let total=0;
-  document.querySelectorAll('.count-input').forEach(i=>total+=parseInt(i.dataset.denom)*(parseInt(i.value)||0));
-  document.getElementById('bagTotal').textContent=total.toLocaleString('ar-IQ');
+function calcBagTotal() {
+  let bagTotal = 0;
+  document.querySelectorAll('.count-input').forEach(inp => {
+    const denom = parseInt(inp.dataset.denom);
+    const count = parseInt(inp.value)||0;
+    const val = denom * count;
+    document.getElementById('val_'+denom).value = val.toLocaleString('ar-IQ');
+    bagTotal += val;
+  });
+  document.getElementById('bagTotal').textContent = bagTotal.toLocaleString('ar-IQ');
+  return bagTotal;
 }
 
-function searchRecord(){
-  const num=document.getElementById('searchNum').value;
-  if(!num){alert('يرجى إدخال رقم الإيداع');return;}
+function saveAudit() {
+  if(!currentIstilamId) return;
+  const bagNum = document.getElementById('auditBagNum').value;
+  if(!bagNum || bagNum <= 0) { showMsg('رقم الكيس غير صالح', true); return; }
   
-  // Show info section with dummy data
-  document.getElementById('infoSection').classList.remove('hidden');
-  document.getElementById('bagsSection').classList.remove('hidden');
-  document.getElementById('dispOpNum').textContent=num;
-  document.getElementById('dispClient').textContent='البنك الأهلي';
-  document.getElementById('dispDate').textContent=new Date().toLocaleDateString('ar-IQ');
-  document.getElementById('dispCurrency').textContent='دينار';
-  document.getElementById('dispTotal').textContent='2,500,000';
-  document.getElementById('dispBags').textContent='5';
+  const formData = new FormData();
+  formData.append('action', 'save_istilam');
+  formData.append('istilam_id', currentIstilamId);
+  formData.append('bag_num', bagNum);
   
-  const from=parseInt(document.getElementById('bagFrom').value)||1;
-  const to=parseInt(document.getElementById('bagTo').value)||5;
-  totalBags=to-from+1;
-  currentBag=from;
-  updateBagNav();
-  buildBagRows();
+  const denoms = currencyDenoms[currentCurrency] || currencyDenoms['دينار'];
+  denoms.forEach(d => {
+    formData.append('d'+d, document.getElementById('inp_'+d).value || 0);
+  });
+  
+  fetch('api_tadqeeq.php', { method: 'POST', body: formData })
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.success) {
+        if(data.data.match === 'match') {
+          showMsg(data.message);
+          printReceipt(bagNum, denoms, data.data.total);
+          
+          // Reset form for next bag
+          document.getElementById('auditBagNum').value = parseInt(bagNum) + 1;
+          buildBagRows();
+        } else {
+          showMsg(data.message + ' - تم تحويل العملية إلى المدير', true);
+          // Optional: redirect to list or clear form
+        }
+      } else {
+        showMsg('خطأ: ' + (data.error || 'حدث خطأ غير معروف'), true);
+      }
+    }).catch(()=>showMsg('تعذر الاتصال بالسيرفر', true));
 }
 
-function updateBagNav(){
-  document.getElementById('bagCounter').textContent=`كيس ${currentBag} من ${parseInt(document.getElementById('bagTo').value)||5}`;
-}
-
-function prevBag(){
-  const from=parseInt(document.getElementById('bagFrom').value)||1;
-  if(currentBag>from){currentBag--;updateBagNav();buildBagRows();}
-}
-function nextBag(){
-  const to=parseInt(document.getElementById('bagTo').value)||5;
-  if(currentBag<to){currentBag++;updateBagNav();buildBagRows();}
-}
-
-function saveTadqeeq(){
-  alert('✅ تم حفظ تدقيق الكيس '+currentBag+' بنجاح!');
+function printReceipt(bagNum, denoms, total) {
+  // Fill print template
+  document.getElementById('pOpNum').textContent = document.getElementById('dispOpNum').textContent;
+  document.getElementById('pDate').textContent = new Date().toLocaleString('ar-IQ');
+  document.getElementById('pClient').textContent = document.getElementById('dispClient').textContent;
+  document.getElementById('pEmp').textContent = document.getElementById('dispEmp').textContent;
+  document.getElementById('pCurrency').textContent = currentCurrency;
+  document.getElementById('pBagNum').textContent = bagNum;
+  document.getElementById('pTotal').textContent = total.toLocaleString('ar-IQ') + ' ' + currentCurrency;
+  
+  const tbody = document.getElementById('pTableBody');
+  tbody.innerHTML = '';
+  denoms.forEach(d => {
+    const count = parseInt(document.getElementById('inp_'+d).value) || 0;
+    if(count > 0) {
+      const val = count * d;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${d.toLocaleString('ar-IQ')}</td><td>${count}</td><td>${val.toLocaleString('ar-IQ')}</td>`;
+      tbody.appendChild(tr);
+    }
+  });
+  
+  window.print();
 }
 </script>
 </body>

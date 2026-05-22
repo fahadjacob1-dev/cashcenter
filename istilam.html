@@ -3,12 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تهيئة الاكياس - الاستلام النقدي</title>
+<title>الاستلام النقدي - نظام الأكياس</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--maroon:#8B0045;--maroon-dark:#6B0035;--gold:#C9A84C;--gold-light:#E2C97E;--white:#fff}
+:root{--maroon:#8B0045;--maroon-dark:#6B0035;--gold:#C9A84C;--gold-light:#E2C97E;--white:#fff; --bg: #f8f9fa}
 body{font-family:'Tajawal',sans-serif;background:var(--maroon);min-height:100vh;color:var(--white)}
+
+/* Hide everything except print area when printing */
+@media print {
+    body * { visibility: hidden; }
+    #printArea, #printArea * { visibility: visible; }
+    #printArea { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; }
+    .page, .topbar, .bottom-bar { display: none !important; }
+}
 
 .topbar{
   background:var(--maroon-dark);
@@ -19,327 +27,329 @@ body{font-family:'Tajawal',sans-serif;background:var(--maroon);min-height:100vh;
 .topbar h2{font-size:20px;font-weight:800;color:var(--gold)}
 .back-btn{
   background:rgba(201,168,76,0.15);
-  border:1px solid var(--gold);
-  color:var(--gold);
+  border:1px solid var(--gold);color:var(--gold);
   padding:8px 20px;border-radius:20px;
   font-family:'Tajawal',sans-serif;font-size:14px;font-weight:600;
-  cursor:pointer;text-decoration:none;
-  transition:all 0.2s;
+  cursor:pointer;text-decoration:none;transition:all 0.2s;
 }
 .back-btn:hover{background:var(--gold);color:var(--maroon-dark)}
 
-.page{padding:24px 30px 80px}
+.page{padding:24px 30px 80px; max-width: 1200px; margin: 0 auto;}
 
-/* Top info section */
-.info-section{
+.card{
   background:rgba(0,0,0,0.2);
   border:1px solid rgba(255,255,255,0.1);
   border-radius:16px;
   padding:20px 24px;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
   margin-bottom:24px;
 }
+
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+
 .field-group{display:flex;flex-direction:column;gap:6px}
-.field-group label{
-  color:var(--gold-light);font-size:13px;font-weight:600;
-  text-align:right;
-}
-.field-group input,
-.field-group select{
+.field-group label{color:var(--gold-light);font-size:13px;font-weight:600;text-align:right;}
+.field-group input, .field-group select{
   background:rgba(255,255,255,0.95);
   border:2px solid rgba(255,255,255,0.3);
-  border-radius:8px;
-  padding:9px 12px;
-  font-family:'Tajawal',sans-serif;
-  font-size:14px;font-weight:500;
-  color:#333;
-  direction:rtl;
-  transition:border-color 0.2s;
+  border-radius:8px;padding:9px 12px;
+  font-family:'Tajawal',sans-serif;font-size:14px;font-weight:500;
+  color:#333;direction:rtl;transition:border-color 0.2s;
 }
-.field-group input:focus,
-.field-group select:focus{
-  outline:none;
-  border-color:var(--gold);
-}
+.field-group input:focus, .field-group select:focus{outline:none;border-color:var(--gold);}
 .field-group input[readonly]{background:rgba(255,255,255,0.7);cursor:default}
 
-/* Divider */
-.divider{
-  height:2px;
-  background:linear-gradient(to left, transparent, var(--gold), transparent);
-  margin:0 0 24px;
-  border-radius:2px;
+.btn{
+  background:var(--gold);color:var(--maroon-dark);
+  border:none;padding:12px 24px;border-radius:8px;
+  font-family:'Tajawal',sans-serif;font-size:16px;font-weight:800;
+  cursor:pointer;transition:all 0.2s;
 }
+.btn:hover{background:var(--gold-light);transform:translateY(-2px)}
 
-/* Currency table */
-.table-header{
-  display:grid;
-  grid-template-columns:120px 1fr 1fr;
-  gap:8px;
-  margin-bottom:10px;
-  padding:0 8px;
-}
-.table-header span{
-  background:rgba(0,0,0,0.25);
-  border:1px solid rgba(201,168,76,0.3);
-  color:var(--gold-light);
-  font-size:13px;font-weight:700;
-  padding:10px;
-  border-radius:8px;
-  text-align:center;
-}
+/* Wizard Step 2: Bag Entry */
+#bagEntrySection { display: none; }
+.bag-header { color: var(--gold); font-size: 18px; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid rgba(201,168,76,0.3); padding-bottom: 10px; }
+.currency-row{ display:grid; grid-template-columns:120px 1fr 1fr; gap:8px; margin-bottom:8px; align-items:center;}
+.denom-label{ background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.25); color:var(--gold-light); font-size:14px;font-weight:700; padding:10px;border-radius:8px; text-align:center;}
+.currency-row input{ background:rgba(255,255,255,0.95); border:2px solid rgba(255,255,255,0.2); border-radius:8px; padding:10px 12px; font-family:'Tajawal',sans-serif; font-size:15px;font-weight:700; color:#333; text-align:center; direction:ltr;}
+.currency-row input.val-cell{ background:rgba(255,255,255,0.7); color:#555; cursor:default; }
 
-.currency-row{
-  display:grid;
-  grid-template-columns:120px 1fr 1fr;
-  gap:8px;
-  margin-bottom:8px;
-  align-items:center;
-}
-.denom-label{
-  background:rgba(201,168,76,0.12);
-  border:1px solid rgba(201,168,76,0.25);
-  color:var(--gold-light);
-  font-size:14px;font-weight:700;
-  padding:10px;border-radius:8px;
-  text-align:center;
-}
-.currency-row input{
-  background:rgba(255,255,255,0.95);
-  border:2px solid rgba(255,255,255,0.2);
-  border-radius:8px;
-  padding:10px 12px;
-  font-family:'Tajawal',sans-serif;
-  font-size:15px;font-weight:700;
-  color:#333;
-  text-align:center;
-  direction:ltr;
-  transition:all 0.2s;
-}
-.currency-row input:focus{outline:none;border-color:var(--gold);background:#fff}
-.currency-row input.value-cell{
-  background:rgba(255,255,255,0.7);
-  color:#555;
-  cursor:default;
-}
+/* Wizard Step 3: Summary */
+#summarySection { display: none; }
+.summary-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; color: #333; border-radius: 8px; overflow: hidden; }
+.summary-table th { background: var(--maroon-dark); color: var(--gold); padding: 12px; text-align: center; }
+.summary-table td { padding: 10px; text-align: center; border-bottom: 1px solid #ddd; font-weight: 500; }
+.summary-table tr:last-child td { border-bottom: none; }
 
-/* Bottom actions */
-.bottom-bar{
-  position:fixed;bottom:0;left:0;right:0;
-  background:var(--maroon-dark);
-  border-top:2px solid var(--gold);
-  padding:14px 30px;
-  display:flex;align-items:center;justify-content:space-between;
-}
-.total-display{
-  display:flex;align-items:center;gap:16px;
-}
-.total-label{color:var(--gold-light);font-size:14px;font-weight:600}
-.total-amount{
-  color:var(--gold);
-  font-size:24px;font-weight:800;
-  letter-spacing:1px;
-}
-.submit-btn{
-  background:var(--gold);
-  color:var(--maroon-dark);
-  border:none;
-  padding:12px 40px;
-  border-radius:25px;
-  font-family:'Tajawal',sans-serif;
-  font-size:16px;font-weight:800;
-  cursor:pointer;
-  transition:all 0.2s;
-  display:flex;align-items:center;gap:8px;
-  box-shadow:0 4px 15px rgba(201,168,76,0.4);
-}
-.submit-btn:hover{background:var(--gold-light);transform:translateY(-2px)}
+/* Print Area (Thermal Ticket) */
+#printArea { display: none; width: 300px; padding: 20px; font-family: monospace; }
+.ticket-header { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 10px;}
+.ticket-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+.ticket-footer { text-align: center; margin-top: 15px; border-top: 1px dashed #000; padding-top: 10px; font-size: 12px;}
 
-.msg{
-  position:fixed;top:80px;right:30px;
-  background:#22c55e;color:#fff;
-  padding:14px 24px;border-radius:12px;
-  font-size:15px;font-weight:700;
-  box-shadow:0 4px 20px rgba(0,0,0,0.3);
-  display:none;z-index:999;
-}
+.msg{position:fixed;top:80px;right:30px;background:#22c55e;color:#fff;padding:14px 24px;border-radius:12px;font-size:15px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:none;z-index:999;}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <h2>💵 تهيئة الاكياس — الاستلام النقدي</h2>
+  <h2>💵 الاستلام النقدي — نظام الأكياس</h2>
   <a href="index.html" class="back-btn">→ الرئيسية</a>
 </div>
 
 <div class="page">
-  <!-- Info Fields -->
-  <div class="info-section">
-    <div class="field-group">
-      <label>اسم الموظف</label>
-      <select id="empName">
-        <option value="">-- اختر --</option>
-        <option>أحمد محمد</option>
-        <option>علي حسن</option>
-        <option>سارة خالد</option>
-      </select>
+  <!-- Step 1: Init Info -->
+  <div class="card" id="step1">
+    <h3 style="color:var(--gold); margin-bottom: 15px;">الخطوة 1: المعلومات الأساسية</h3>
+    <div class="grid-3">
+      <div class="field-group">
+        <label>اسم الموظف</label>
+        <select id="empName">
+          <option value="">-- اختر --</option>
+          <option value="1">المدير العام</option>
+          <option value="2">أحمد محمد</option>
+          <option value="3">علي حسن</option>
+          <option value="4">سارة خالد</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>اسم العميل</label>
+        <select id="clientName">
+          <option value="">-- اختر --</option>
+          <option value="1">البنك الأهلي</option>
+          <option value="2">المصرف العربي</option>
+          <option value="3">بنك بغداد</option>
+          <option value="4">مصرف الرشيد</option>
+          <option value="5">مصرف الرافدين</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>تاريخ الإيداع</label>
+        <input type="datetime-local" id="depDate">
+      </div>
+      <div class="field-group">
+        <label>نوع العملة</label>
+        <select id="currency">
+          <option value="دينار">دينار</option>
+          <option value="دولار">دولار</option>
+          <option value="يورو">يورو</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>السيولة</label>
+        <input type="text" id="liquidity" placeholder="0">
+      </div>
+      <div class="field-group">
+        <label>عدد الأكياس</label>
+        <input type="number" id="bagsCount" placeholder="1" min="1" value="1">
+      </div>
     </div>
-    <div class="field-group">
-      <label>كلمة المرور</label>
-      <input type="password" id="empPass" placeholder="••••••">
-    </div>
-    <div class="field-group">
-      <label>اسم العميل</label>
-      <select id="clientName">
-        <option value="">-- اختر --</option>
-        <option>البنك الأهلي</option>
-        <option>المصرف العربي</option>
-        <option>بنك بغداد</option>
-      </select>
-    </div>
-    <div class="field-group">
-      <label>تاريخ الإيداع</label>
-      <input type="datetime-local" id="depDate">
-    </div>
-    <div class="field-group">
-      <label>نوع العملة</label>
-      <select id="currency">
-        <option>دينار</option>
-        <option>دولار</option>
-        <option>يورو</option>
-      </select>
-    </div>
-    <div class="field-group">
-      <label>المبلغ الكلي</label>
-      <input type="text" id="totalField" readonly value="0">
-    </div>
-    <div class="field-group">
-      <label>السيولة</label>
-      <input type="text" id="liquidity" placeholder="أدخل السيولة">
-    </div>
-    <div class="field-group">
-      <label>عدد الاكياس</label>
-      <input type="number" id="bagsCount" placeholder="0" min="0">
-    </div>
-    <div class="field-group">
-      <label>&nbsp;</label>
-      <button class="submit-btn" onclick="submitBags()" style="width:100%;justify-content:center;font-size:14px;padding:9px 20px">
-        تهيئة الاكياس ✓
-      </button>
+    <div style="margin-top: 20px; text-align: left;">
+      <button class="btn" onclick="startBags()">تهيئة الأكياس 🎒</button>
     </div>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- Currency Table -->
-  <div class="table-header">
-    <span>الفئة</span>
-    <span>أدخل عدد الأوراق</span>
-    <span>قيمة الأوراق النقدية</span>
+  <!-- Step 2: Bag Entry -->
+  <div class="card" id="bagEntrySection">
+    <div class="bag-header" id="bagHeaderTitle">جاري إدخال الكيس رقم: 1</div>
+    <div id="currencyRows"></div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+      <div style="font-size: 18px; font-weight: bold; color: var(--gold);">مجموع الكيس: <span id="currentBagTotal">0</span></div>
+      <button class="btn" onclick="nextBag()" id="nextBagBtn">التالي ←</button>
+    </div>
   </div>
 
-  <div id="currencyRows"></div>
+  <!-- Step 3: Summary -->
+  <div class="card" id="summarySection">
+    <div class="bag-header">ملخص الأكياس المدخلة</div>
+    <table class="summary-table" id="summaryTable">
+      <thead>
+        <tr>
+          <th>الكيس</th>
+          <th>مجموع الكيس</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <th style="text-align: left; padding: 10px;">المجموع الكلي:</th>
+          <th id="grandTotalLabel" style="font-size: 18px;">0</th>
+        </tr>
+      </tfoot>
+    </table>
+    <div style="margin-top: 20px; text-align: left;">
+      <button class="btn" onclick="saveAll()" style="background: #22c55e; color: #fff;">تسجيل وطباعة وصولات 🖨️</button>
+    </div>
+  </div>
 </div>
 
-<div class="bottom-bar">
-  <div class="total-display">
-    <span class="total-label">المجموع الكلي:</span>
-    <span class="total-amount" id="grandTotal">0</span>
-    <span class="total-label" id="currencyLabel">دينار</span>
+<!-- Print Ticket Template -->
+<div id="printArea">
+  <div class="ticket-header">
+    CASH CENTER<br>
+    إيصال استلام نقد
   </div>
-  <button class="submit-btn" onclick="saveRecord()">
-    تسجيل ＋
-  </button>
+  <div class="ticket-row"><span>رقم العملية:</span> <span id="lblOpNum">-</span></div>
+  <div class="ticket-row"><span>التاريخ:</span> <span id="lblDate">-</span></div>
+  <div class="ticket-row"><span>الموظف:</span> <span id="lblEmp">-</span></div>
+  <div class="ticket-row"><span>العميل:</span> <span id="lblClient">-</span></div>
+  <div class="ticket-row"><span>العملة:</span> <span id="lblCurrency">-</span></div>
+  <div class="ticket-row"><span>عدد الأكياس:</span> <span id="lblBags">-</span></div>
+  <div style="border-bottom: 1px dashed #000; margin: 10px 0;"></div>
+  <div class="ticket-row" style="font-weight: bold; font-size: 16px;">
+    <span>المبلغ الكلي:</span> <span id="lblTotal">-</span>
+  </div>
+  <div class="ticket-footer">
+    يرجى الاحتفاظ بهذا الوصل للمراجعة<br>
+    طبع بواسطة النظام الآلي
+  </div>
 </div>
 
 <div class="msg" id="successMsg">✅ تم تسجيل العملية بنجاح!</div>
 
 <script>
-const DENOMS = [50000,25000,10000,5000,1000,500,250];
-const rows = document.getElementById('currencyRows');
+let totalBags = 0;
+let currentBag = 1;
+let allBagsData = [];
+let currencyDenoms = {
+  'دينار': [50000, 25000, 10000, 5000, 1000, 500, 250],
+  'دولار': [100, 50, 20, 10, 5, 2, 1],
+  'يورو': [500, 200, 100, 50, 20, 10, 5]
+};
+let activeDenoms = [];
 
-// Build rows
-DENOMS.forEach(d=>{
-  const row = document.createElement('div');
-  row.className = 'currency-row';
-  row.innerHTML = `
-    <div class="denom-label">${d.toLocaleString('ar-IQ')}</div>
-    <input type="number" class="count-input" data-denom="${d}" value="0" min="0"
-           oninput="calcRow(this)">
-    <input type="text" class="value-cell" id="val_${d}" value="0" readonly>
-  `;
-  rows.appendChild(row);
-});
+document.getElementById('depDate').value = new Date().toISOString().slice(0,16);
 
-// Set default date
-const now = new Date();
-document.getElementById('depDate').value = now.toISOString().slice(0,16);
-
-function calcRow(input){
-  const denom = parseInt(input.dataset.denom);
-  const count = parseInt(input.value)||0;
-  const val = denom * count;
-  document.getElementById('val_'+denom).value = val.toLocaleString('ar-IQ');
-  calcTotal();
-}
-
-function calcTotal(){
-  let total = 0;
-  document.querySelectorAll('.count-input').forEach(inp=>{
-    total += (parseInt(inp.dataset.denom))*(parseInt(inp.value)||0);
-  });
-  document.getElementById('grandTotal').textContent = total.toLocaleString('ar-IQ');
-  document.getElementById('totalField').value = total.toLocaleString('ar-IQ');
-}
-
-document.getElementById('currency').addEventListener('change',function(){
-  document.getElementById('currencyLabel').textContent = this.value;
-});
-
-function submitBags(){
-  const bags = parseInt(document.getElementById('bagsCount').value)||0;
-  if(bags<=0){alert('يرجى إدخال عدد الاكياس');return;}
-  alert('✅ تم تهيئة '+bags+' اكياس بنجاح!');
-}
-
-function saveRecord(){
+function startBags() {
   const emp = document.getElementById('empName').value;
-  if(!emp){alert('يرجى اختيار اسم الموظف');return;}
+  const client = document.getElementById('clientName').value;
+  totalBags = parseInt(document.getElementById('bagsCount').value)||0;
+  
+  if(!emp || !client || totalBags <= 0) {
+    alert('يرجى التأكد من اختيار الموظف والعميل وعدد الأكياس');
+    return;
+  }
 
-  const denoms = {};
-  document.querySelectorAll('.count-input').forEach(inp=>{
-    denoms['d'+inp.dataset.denom] = inp.value||0;
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('bagEntrySection').style.display = 'block';
+  
+  activeDenoms = currencyDenoms[document.getElementById('currency').value];
+  buildCurrencyRows();
+  updateBagHeader();
+}
+
+function buildCurrencyRows() {
+  const rows = document.getElementById('currencyRows');
+  rows.innerHTML = '';
+  activeDenoms.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'currency-row';
+    row.innerHTML = `
+      <div class="denom-label">${d.toLocaleString('ar-IQ')}</div>
+      <input type="number" class="count-input" id="inp_${d}" data-denom="${d}" value="0" min="0" oninput="calcBagTotal()">
+      <input type="text" class="val-cell" id="val_${d}" value="0" readonly>
+    `;
+    rows.appendChild(row);
   });
+}
 
-  const total = document.getElementById('grandTotal').textContent.replace(/,/g,'');
+function calcBagTotal() {
+  let bagTotal = 0;
+  document.querySelectorAll('.count-input').forEach(inp => {
+    const denom = parseInt(inp.dataset.denom);
+    const count = parseInt(inp.value)||0;
+    const val = denom * count;
+    document.getElementById('val_'+denom).value = val.toLocaleString('ar-IQ');
+    bagTotal += val;
+  });
+  document.getElementById('currentBagTotal').textContent = bagTotal.toLocaleString('ar-IQ');
+  return bagTotal;
+}
 
+function nextBag() {
+  // Save current bag
+  let bagData = { bag_num: currentBag, total_amount: calcBagTotal() };
+  activeDenoms.forEach(d => {
+    bagData['d'+d] = parseInt(document.getElementById('inp_'+d).value)||0;
+  });
+  allBagsData.push(bagData);
+
+  if(currentBag < totalBags) {
+    currentBag++;
+    updateBagHeader();
+    buildCurrencyRows(); // reset rows
+    document.getElementById('currentBagTotal').textContent = '0';
+  } else {
+    showSummary();
+  }
+}
+
+function updateBagHeader() {
+  document.getElementById('bagHeaderTitle').textContent = `جاري إدخال الكيس رقم: ${currentBag} من أصل ${totalBags}`;
+  if(currentBag === totalBags) {
+    document.getElementById('nextBagBtn').textContent = 'إنهاء ومعاينة الأكياس ✓';
+  }
+}
+
+function showSummary() {
+  document.getElementById('bagEntrySection').style.display = 'none';
+  document.getElementById('summarySection').style.display = 'block';
+  
+  const tbody = document.querySelector('#summaryTable tbody');
+  tbody.innerHTML = '';
+  let grandTotal = 0;
+  
+  allBagsData.forEach(b => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>كيس #${b.bag_num}</td><td>${b.total_amount.toLocaleString('ar-IQ')}</td>`;
+    tbody.appendChild(tr);
+    grandTotal += b.total_amount;
+  });
+  
+  document.getElementById('grandTotalLabel').textContent = grandTotal.toLocaleString('ar-IQ') + ' ' + document.getElementById('currency').value;
+}
+
+function saveAll() {
   const formData = new FormData();
-  formData.append('action','save');
-  formData.append('emp_name', emp);
-  formData.append('client_name', document.getElementById('clientName').value);
+  formData.append('action', 'save');
+  formData.append('emp_id', document.getElementById('empName').value);
+  formData.append('client_id', document.getElementById('clientName').value);
   formData.append('op_date', document.getElementById('depDate').value);
   formData.append('currency', document.getElementById('currency').value);
-  formData.append('total_amount', total);
-  formData.append('bags_count', document.getElementById('bagsCount').value||0);
-  Object.entries(denoms).forEach(([k,v])=>formData.append(k,v));
+  formData.append('bags_count', totalBags);
+  formData.append('liquidity', document.getElementById('liquidity').value || 0);
+  formData.append('bags_data', JSON.stringify(allBagsData));
 
-  fetch('api_istilam.php', {method:'POST', body:formData})
-    .then(r=>r.json())
-    .then(data=>{
-      if(data.success){
+  fetch('api_istilam.php', { method: 'POST', body: formData })
+    .then(r => r.json())
+    .then(data => {
+      if(data.success) {
+        // Fill print ticket
+        const selEmp = document.getElementById('empName');
+        const selClient = document.getElementById('clientName');
+        document.getElementById('lblOpNum').textContent = data.op_num || '---';
+        document.getElementById('lblDate').textContent = document.getElementById('depDate').value;
+        document.getElementById('lblEmp').textContent = selEmp.options[selEmp.selectedIndex].text;
+        document.getElementById('lblClient').textContent = selClient.options[selClient.selectedIndex].text;
+        document.getElementById('lblCurrency').textContent = document.getElementById('currency').value;
+        document.getElementById('lblBags').textContent = totalBags;
+        document.getElementById('lblTotal').textContent = document.getElementById('grandTotalLabel').textContent;
+        
+        // Show success msg
         const msg = document.getElementById('successMsg');
-        msg.style.display='block';
-        setTimeout(()=>msg.style.display='none', 3000);
-        document.querySelectorAll('.count-input').forEach(inp=>{inp.value=0});
-        document.querySelectorAll('.value-cell').forEach(inp=>{inp.value='0'});
-        calcTotal();
+        msg.style.display = 'block';
+        setTimeout(() => { msg.style.display = 'none'; }, 3000);
+        
+        // Print
+        window.print();
+        
+        // Reload after print
+        setTimeout(() => { window.location.reload(); }, 1500);
       } else {
-        alert('خطأ: '+data.message);
+        alert('خطأ: ' + (data.error || 'حدث خطأ غير معروف'));
       }
     })
-    .catch(()=>alert('تعذر الاتصال بالسيرفر'));
+    .catch(() => alert('تعذر الاتصال بالسيرفر'));
 }
 </script>
 </body>

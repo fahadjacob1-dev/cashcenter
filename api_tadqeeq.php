@@ -10,6 +10,21 @@ $action = $_REQUEST['action'] ?? '';
 
 switch ($action) {
 
+    // ── جلب تفاصيل الاستلام برقم العملية ────────────────────
+    case 'get_istilam_info':
+        $op_num = trim($_GET['op_num'] ?? '');
+        if (!$op_num) json_error('رقم العملية مطلوب');
+
+        $stmt = $conn->prepare('SELECT i.*, c.name as client_name, u.full_name as emp_name FROM istilam i JOIN clients c ON c.id = i.client_id JOIN users u ON u.id = i.emp_id WHERE i.op_num = ?');
+        $stmt->bind_param('s', $op_num);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        if ($res->num_rows === 0) json_error('العملية غير موجودة', 404);
+        
+        $info = $res->fetch_assoc();
+        json_success($info);
+        break;
+
     // ── حفظ تدقيق استلام ────────────────────────────
     case 'save_istilam':
         $istilam_id  = (int)($_POST['istilam_id'] ?? 0);
@@ -30,12 +45,12 @@ switch ($action) {
                + ($d5000  *  5000) + ($d1000  *  1000) + ($d500   *   500)
                + ($d250   *   250);
 
-        // جلب المبلغ الأصلي للمقارنة
-        $orig = $conn->prepare('SELECT total_amount FROM istilam WHERE id = ?');
-        $orig->bind_param('i', $istilam_id);
+        // جلب المبلغ الأصلي للمقارنة من جدول الأكياس
+        $orig = $conn->prepare('SELECT b.total_amount, i.client_id, i.currency FROM istilam_bags b JOIN istilam i ON i.id = b.istilam_id WHERE b.istilam_id = ? AND b.bag_num = ?');
+        $orig->bind_param('ii', $istilam_id, $bag_num);
         $orig->execute();
         $orig_row = $orig->get_result()->fetch_assoc();
-        if (!$orig_row) json_error('عملية الاستلام غير موجودة', 404);
+        if (!$orig_row) json_error('الكيس غير موجود ضمن عملية الاستلام المحددة', 404);
 
         $match = (abs($total - (float)$orig_row['total_amount']) < 0.001) ? 'match' : 'mismatch';
 
@@ -53,15 +68,49 @@ switch ($action) {
         );
 
         if ($stmt->execute()) {
-            // إذا في اختلاف، حدّث حالة الاستلام
+            $tadqeeq_id = (int)$conn->insert_id;
+            
+            // إذا في اختلاف، حولها للمدير (جدول الاختلافات)
             if ($match === 'mismatch') {
                 $upd = $conn->prepare("UPDATE istilam SET status = 'dispute' WHERE id = ?");
                 $upd->bind_param('i', $istilam_id);
                 $upd->execute();
+                
+                $diff_amount = $total - (float)$orig_row['total_amount'];
+                $ikh = $conn->prepare("INSERT INTO ikhtilaf (op_type, op_id, bag_num, diff_amount, notes, status) VALUES ('istilam', ?, ?, ?, 'اختلاف أثناء التدقيق', 'pending')");
+                $ikh->bind_param('iid', $istilam_id, $bag_num, $diff_amount);
+                $ikh->execute();
             } else {
-                $upd = $conn->prepare("UPDATE istilam SET status = 'audited' WHERE id = ?");
-                $upd->bind_param('i', $istilam_id);
-                $upd->execute();
+                // إذا متطابقة، يثبتها نقد غير معدود (للمدير أو الخزنة)
+                // سنقوم بإنشاء جدول نقد غير معدود مؤقت أو تحديث حالة العملية
+                $conn->query("CREATE TABLE IF NOT EXISTS naqd_ghayrmaadoood (
+                    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    istilam_id INT UNSIGNED NOT NULL,
+                    bag_num SMALLINT UNSIGNED NOT NULL,
+                    amount DECIMAL(18,3) NOT NULL,
+                    currency VARCHAR(50) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )");
+                $ins_naqd = $conn->prepare("INSERT INTO naqd_ghayrmaadoood (istilam_id, bag_num, amount, currency) VALUES (?, ?, ?, ?)");
+                $ins_naqd->bind_param('iids', $istilam_id, $bag_num, $total, $orig_row['currency']);
+                $ins_naqd->execute();
+
+                // التحقق ما إذا كانت جميع الأكياس مدققة بنجاح
+                $check = $conn->prepare("SELECT COUNT(*) as c FROM istilam_bags WHERE istilam_id = ?");
+                $check->bind_param('i', $istilam_id);
+                $check->execute();
+                $bags_total = $check->get_result()->fetch_assoc()['c'];
+                
+                $check2 = $conn->prepare("SELECT COUNT(*) as c FROM tadqeeq_istilam WHERE istilam_id = ? AND match_status='match'");
+                $check2->bind_param('i', $istilam_id);
+                $check2->execute();
+                $bags_audited = $check2->get_result()->fetch_assoc()['c'];
+                
+                if ($bags_total == $bags_audited) {
+                    $upd = $conn->prepare("UPDATE istilam SET status = 'audited' WHERE id = ?");
+                    $upd->bind_param('i', $istilam_id);
+                    $upd->execute();
+                }
             }
 
             log_action('tadqeeq_istilam_' . $match, 'tadqeeq_istilam', (int)$conn->insert_id);
