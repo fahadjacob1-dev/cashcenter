@@ -17,9 +17,8 @@ body {
 
 /* ---------------- Print Styles (A4 Receipt) ---------------- */
 @media print {
-    body * { visibility: hidden; }
-    #printArea, #printArea * { visibility: visible; }
-    #printArea { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; font-family: 'Tajawal', sans-serif; padding: 20px;}
+    body > :not(#printArea) { display: none !important; }
+    #printArea { display: block !important; width: 100%; color: #000; background: #fff; font-family: 'Tajawal', sans-serif; padding: 20px;}
     .print-header-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: center; font-weight: bold; margin-bottom: 20px; border: 1px solid #000; }
     .print-header-grid div { padding: 8px; border: 1px solid #ccc;}
     .print-title { text-align: center; font-size: 22px; font-weight: bold; margin: 20px 0; }

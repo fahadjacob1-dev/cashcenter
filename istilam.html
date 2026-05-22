@@ -17,10 +17,9 @@ body {
 
 /* ---------------- Print Styles (Thermal) ---------------- */
 @media print {
-    body * { visibility: hidden; }
-    #printArea, #printArea * { visibility: visible; }
-    #printArea { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; font-family: monospace; }
-    .label-page { page-break-after: always; padding: 10px; width: 300px; text-align: center; }
+    body > :not(#printArea) { display: none !important; }
+    #printArea { display: block !important; width: 100%; color: #000; background: #fff; font-family: monospace; }
+    .label-page { page-break-after: always; padding: 10px; width: 300px; text-align: center; margin: 0 auto; }
     .logo-placeholder { font-weight: bold; font-size: 20px; border-bottom: 2px solid #000; margin-bottom: 10px; padding-bottom: 5px; color: #8b0045;}
     .label-row { display: flex; justify-content: space-between; border: 1px solid #000; margin-bottom: 5px; font-size: 14px; font-weight: bold; }
     .label-row div { padding: 5px; flex: 1; }
@@ -207,11 +206,11 @@ body {
     <!-- Main Form (Right in screenshot) -->
     <div class="form-panel">
         <div class="form-row">
-            <input type="text" id="empName" placeholder="اسم الموظف">
+            <input type="text" id="empName" placeholder="اسم الموظف" autocomplete="new-password">
             <label>اسم الموظف</label>
         </div>
         <div class="form-row">
-            <input type="password" id="empPass" placeholder="كلمة المرور">
+            <input type="password" id="empPass" placeholder="كلمة المرور" autocomplete="new-password">
             <label>كلمة المرور</label>
         </div>
         <div class="form-row">

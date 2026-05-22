@@ -12,11 +12,10 @@ switch ($action) {
 
     // ── جلب الرقم القادم للعملية ────────────────────
     case 'get_next_op_num':
-        // نجلب الرقم التلقائي القادم (AUTO_INCREMENT) لجدول istilam
-        $res = $conn->query("SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'istilam' AND table_schema = DATABASE()");
+        $res = $conn->query("SELECT MAX(id) AS max_id FROM istilam");
         $next_id = 1;
         if ($res && $row = $res->fetch_assoc()) {
-            $next_id = (int)$row['AUTO_INCREMENT'];
+            $next_id = (int)$row['max_id'] + 1;
         }
         json_success(['next_op_num' => $next_id]);
         break;
