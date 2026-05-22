@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول — Cash Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--maroon:#8B0045;--maroon-dark:#6B0035;--gold:#C9A84C;--gold-light:#E2C97E}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:var(--maroon);
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse at 30% 40%,rgba(201,168,76,0.08) 0%,transparent 60%);
+  pointer-events:none;
+}
+.card{
+  background:rgba(0,0,0,0.35);
+  border:1px solid rgba(201,168,76,0.25);
+  border-radius:20px;
+  padding:48px 40px;
+  width:100%;max-width:400px;
+  position:relative;z-index:1;
+  backdrop-filter:blur(4px);
+}
+.logo{text-align:center;margin-bottom:32px}
+.logo-icon{
+  width:70px;height:70px;background:var(--gold);
+  border-radius:18px;margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;
+}
+.logo h1{color:#fff;font-size:22px;font-weight:800;margin-bottom:4px}
+.logo p{color:var(--gold-light);font-size:12px;letter-spacing:1px}
+
+.field{margin-bottom:18px}
+.field label{
+  display:block;color:var(--gold-light);
+  font-size:13px;font-weight:600;margin-bottom:7px;
+}
+.field input{
+  width:100%;
+  background:rgba(255,255,255,0.92);
+  border:2px solid rgba(255,255,255,0.2);
+  border-radius:10px;
+  padding:12px 16px;
+  font-family:'Tajawal',sans-serif;
+  font-size:15px;font-weight:500;
+  color:#333;direction:rtl;
+  transition:border-color 0.2s;
+}
+.field input:focus{outline:none;border-color:var(--gold);background:#fff}
+
+.submit-btn{
+  width:100%;
+  background:var(--gold);
+  color:var(--maroon-dark);
+  border:none;
+  padding:14px;
+  border-radius:25px;
+  font-family:'Tajawal',sans-serif;
+  font-size:17px;font-weight:800;
+  cursor:pointer;
+  margin-top:8px;
+  transition:all 0.2s;
+  box-shadow:0 4px 20px rgba(201,168,76,0.4);
+}
+.submit-btn:hover{background:var(--gold-light);transform:translateY(-2px)}
+.submit-btn:disabled{opacity:0.6;cursor:default;transform:none}
+
+.error-msg{
+  background:rgba(239,68,68,0.12);
+  border:1px solid rgba(239,68,68,0.35);
+  color:#f87171;
+  padding:12px 16px;
+  border-radius:10px;
+  font-size:14px;
+  font-weight:600;
+  margin-bottom:18px;
+  display:none;
+  text-align:center;
+}
+.spinner{display:none;text-align:center;margin-top:12px;color:var(--gold-light);font-size:14px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">💰</div>
+    <h1>Cash Center</h1>
+    <p>YOUR BUSINESS . OUR SOLUTIONS</p>
+  </div>
+
+  <div class="error-msg" id="errMsg"></div>
+
+  <div class="field">
+    <label>اسم المستخدم</label>
+    <input type="text" id="username" placeholder="أدخل اسم المستخدم" autocomplete="username" autofocus>
+  </div>
+  <div class="field">
+    <label>كلمة المرور</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+  </div>
+
+  <button class="submit-btn" id="loginBtn" onclick="doLogin()">تسجيل الدخول</button>
+  <div class="spinner" id="spinner">جاري التحقق...</div>
+</div>
+
+<script>
+// إذا موجود جلسة، روّح للرئيسية
+fetch('api_auth.php?action=check')
+  .then(r => r.json())
+  .then(d => { if (d.data?.logged_in) location.href = 'index.html'; })
+  .catch(() => {});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function doLogin() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const btn      = document.getElementById('loginBtn');
+  const err      = document.getElementById('errMsg');
+  const spin     = document.getElementById('spinner');
+
+  if (!username || !password) {
+    showErr('يرجى إدخال اسم المستخدم وكلمة المرور');
+    return;
+  }
+
+  btn.disabled = true;
+  spin.style.display = 'block';
+  err.style.display  = 'none';
+
+  const fd = new FormData();
+  fd.append('action',   'login');
+  fd.append('username', username);
+  fd.append('password', password);
+
+  try {
+    const res  = await fetch('api_auth.php', { method: 'POST', body: fd });
+    const data = await res.json();
+
+    if (data.success) {
+      // حفظ بيانات المستخدم في sessionStorage
+      sessionStorage.setItem('user', JSON.stringify(data.data));
+      location.href = 'index.html';
+    } else {
+      showErr(data.error || 'خطأ في تسجيل الدخول');
+    }
+  } catch {
+    showErr('تعذر الاتصال بالسيرفر');
+  } finally {
+    btn.disabled = false;
+    spin.style.display = 'none';
+  }
+}
+
+function showErr(msg) {
+  const el = document.getElementById('errMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+</script>
+</body>
+</html>
