@@ -1,10 +1,8 @@
-FROM php:8.2-apache
-RUN docker-php-ext-install mysqli pdo pdo_mysql \
-    && a2enmod rewrite \
-    && sed -i 's/^ServerTokens OS/ServerTokens Prod/' /etc/apache2/apache2.conf \
-    && echo "ServerName localhost" >> /etc/apache2/apache2.conf
+FROM php:8.2-fpm-alpine
+RUN apk add --no-cache nginx \
+    && docker-php-ext-install mysqli pdo pdo_mysql
 COPY . /var/www/html/
-RUN chown -R www-data:www-data /var/www/html \
-    && find /var/www/html -type f -name "*.php" -exec chmod 644 {} \;
+COPY nginx.conf /etc/nginx/nginx.conf
+RUN chown -R www-data:www-data /var/www/html
 EXPOSE 80
-CMD ["apache2-foreground"]
+CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
