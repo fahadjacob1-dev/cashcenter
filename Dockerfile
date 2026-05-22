@@ -1,9 +1,5 @@
 FROM php:8.2-apache
 
-# حل مشكلة تعارض الـ MPM (تعطيل الإضافات المتعارضة والإبقاء على prefork)
-RUN a2dismod mpm_event mpm_worker || true \
-    && a2enmod mpm_prefork
-
 # تفعيل الإضافات الضرورية لقواعد البيانات
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
@@ -16,3 +12,6 @@ RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/a
 # نسخ ملفات المشروع وإعطاء الصلاحيات
 COPY . /var/www/html/
 RUN chown -R www-data:www-data /var/www/html
+
+# الحل النهائي: إجبار السيرفر على تعطيل التعارض في لحظة التشغيل
+CMD ["/bin/bash", "-c", "a2dismod mpm_event mpm_worker || true && a2enmod mpm_prefork && apache2-foreground"]
