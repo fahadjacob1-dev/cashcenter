@@ -86,7 +86,7 @@ function fillSelect(selectId, items, valueKey, labelKey) {
   const sel = document.getElementById(selectId);
   if (!sel) return;
   const current = sel.value;
-  sel.innerHTML = '<option value="">-- اختر --</option>';
+  sel.innerHTML = '<option value="" disabled selected>-- يرجى الاختيار --</option>';
   items.forEach(item => {
     const opt = document.createElement('option');
     opt.value       = item[valueKey];

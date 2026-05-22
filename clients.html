@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة العملاء — Cash Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    font-family: 'Tajawal', sans-serif;
+    background: #8b0045;
+    color: white;
+    min-height: 100vh;
+}
+.topbar { 
+    background: #6b0035; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #c9a84c; 
+}
+.back-btn { 
+    color: #6b0035; text-decoration: none; font-weight: bold; background: #c9a84c; padding: 8px 20px; border-radius: 8px; font-size: 14px; transition: all 0.2s;
+}
+.back-btn:hover { background: #e2c97e; transform: translateY(-2px); }
+
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 20px;
+    padding: 30px;
+    backdrop-filter: blur(10px);
+}
+h2 {
+    color: #c9a84c;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+}
+
+.form-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+.form-group input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.9);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    outline: none;
+    transition: all 0.3s;
+}
+.form-group input:focus { border-color: #c9a84c; background: #fff; }
+
+.btn-add {
+    background: #c9a84c;
+    color: #6b0035;
+    border: none;
+    padding: 0 30px;
+    border-radius: 10px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-add:hover { background: #e2c97e; transform: translateY(-2px); }
+
+.clients-list {
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.client-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: rgba(255,255,255,0.1);
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+    font-weight: bold;
+    font-size: 15px;
+}
+.client-item:last-child { margin-bottom: 0; }
+
+.msg {
+    text-align: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    display: none;
+}
+.msg.success { background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+.msg.error { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #c9a84c; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <a href="index.html" class="back-btn">رجوع للرئيسية</a>
+    <div style="font-weight:bold; font-size:18px;">إدارة العملاء</div>
+</div>
+
+<div class="container">
+    <h2>العملاء المسجلين</h2>
+    
+    <div id="msgBox" class="msg"></div>
+
+    <div class="form-group" data-role="admin">
+        <input type="text" id="newClientName" placeholder="اكتب اسم العميل الجديد هنا...">
+        <button class="btn-add" onclick="addClient()" id="btnAdd">إضافة عميل</button>
+    </div>
+
+    <div class="clients-list" id="clientsList">
+        <div style="text-align:center; opacity:0.7;">جاري التحميل...</div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', loadClients);
+
+function loadClients() {
+    fetch('api_clients.php?action=get_all')
+    .then(r => r.json())
+    .then(data => {
+        const list = document.getElementById('clientsList');
+        list.innerHTML = '';
+        if(data.success && data.data.length > 0) {
+            data.data.forEach((client, idx) => {
+                list.innerHTML += `
+                    <div class="client-item">
+                        <span>${idx + 1}. ${client.name}</span>
+                        <span style="opacity:0.5; font-size:12px;">#${client.id}</span>
+                    </div>
+                `;
+            });
+        } else {
+            list.innerHTML = '<div style="text-align:center; opacity:0.7;">لا يوجد عملاء مسجلين</div>';
+        }
+    })
+    .catch(e => {
+        document.getElementById('clientsList').innerHTML = '<div style="text-align:center; color:#f87171;">خطأ في الاتصال</div>';
+    });
+}
+
+function addClient() {
+    const nameInput = document.getElementById('newClientName');
+    const name = nameInput.value.trim();
+    const msgBox = document.getElementById('msgBox');
+    const btn = document.getElementById('btnAdd');
+
+    if(!name) {
+        showMsg('error', 'يرجى كتابة اسم العميل أولاً');
+        nameInput.focus();
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'جاري الإضافة...';
+
+    const fd = new FormData();
+    fd.append('action', 'add');
+    fd.append('name', name);
+
+    fetch('api_clients.php', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+        if(data.success) {
+            showMsg('success', 'تم إضافة العميل بنجاح!');
+            nameInput.value = '';
+            loadClients();
+        } else {
+            showMsg('error', data.error || 'حدث خطأ أثناء الإضافة');
+        }
+    })
+    .catch(e => showMsg('error', 'خطأ في الاتصال'))
+    .finally(() => {
+        btn.disabled = false;
+        btn.textContent = 'إضافة عميل';
+    });
+}
+
+function showMsg(type, text) {
+    const msgBox = document.getElementById('msgBox');
+    msgBox.textContent = text;
+    msgBox.className = 'msg ' + type;
+    msgBox.style.display = 'block';
+    setTimeout(() => { msgBox.style.display = 'none'; }, 3000);
+}
+</script>
+<script src="auth_check.js"></script>
+</body>
+</html>
