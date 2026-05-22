@@ -5,6 +5,7 @@
 require_once 'config.php';
 
 // التأكد من أن المستخدم مدير (admin) فقط
+require_auth();
 require_role('admin');
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
